@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { db } from "@/db";
 import { jobs } from "@/db/schema";
 import { companies } from "@/lib/companies";
+import { MATCH_AUC } from "@/lib/eval-summary";
 import { buttonClass, REPO_URL, Tag } from "./ui";
 
 const steps = [
@@ -44,7 +45,7 @@ export default function Home() {
           </Suspense>
         </Stat>
         <Stat label="companies">{companies.length}</Stat>
-        <Stat label="AUC on a labeled eval">0.91</Stat>
+        <Stat label="AUC on a labeled eval">{MATCH_AUC}</Stat>
         <Stat label="to run">$0</Stat>
       </dl>
 

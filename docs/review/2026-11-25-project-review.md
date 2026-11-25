@@ -88,9 +88,9 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 - **Fix:** Add parsers for SmartRecruiters, Workable and Recruitee (public posting APIs, no key). Add more Indian companies. Consider moving the company list to a config file so adding a company doesn't need a code change (keep the curated `site` list that research is limited to).
 
 ### 2.8 Accounts
-- [ ] **Password reset:** Better Auth supports it but needs an email sender, so make it optional (SMTP env vars) and hide the link when unset.
-- [ ] **Delete my data:** delete the resume text, the profile and the account. Cascades already exist on `user.id`.
-- [ ] **Restrict sign-up on self-hosted instances:** sign-up is open to anyone, so a public instance lets strangers queue LLM and Playwright jobs on your machine. Add `ALLOW_SIGNUP=0` and/or an `ALLOWED_EMAILS` list.
+- [ ] **Password reset:** Better Auth supports it but needs an email sender, so make it optional (SMTP env vars) and hide the link when unset. **Not done yet:** needs an email sender (`nodemailer`); installing a new dependency needs the owner's go-ahead.
+- [x] **Delete my data:** delete the resume text, the profile and the account. Cascades already exist on `user.id`. **Done:** "Delete your account" on `/profile`: type your email to confirm; the action signs out, then deletes the user row, and profile, resume text, cached embedding, scores, tracker, `matches_seen` and sessions all cascade. Integration test checks every row of that user is gone and another user's are untouched; checked in the browser too. Disabled in demo mode.
+- [x] **Restrict sign-up on self-hosted instances:** sign-up is open to anyone, so a public instance lets strangers queue LLM and Playwright jobs on your machine. Add `ALLOW_SIGNUP=0` and/or an `ALLOWED_EMAILS` list. **Done:** `lib/signup.ts` (unit-tested): `ALLOW_SIGNUP=0` closes sign-up, `ALLOWED_EMAILS` (emails or `@domain`) makes it invite-only, open when both are unset. Enforced in Better Auth's `databaseHooks.user.create.before`, so GitHub sign-in can't create accounts around it; the login page hides "Create an account" when closed. Checked against a running server: strangers get a 403 with the reason, invited emails and existing users still get in.
 
 ---
 
@@ -126,19 +126,19 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 ### 3.6 Smaller items
 - [ ] Resume profile extraction runs the LLM inside the server action (~30s, `app/profile/actions.ts:63-72`). Move it to the worker like scoring and research, with progress over `/api/progress`.
 - [ ] Persist the last scoring and research run status. Today a failure is only an SSE event, lost on refresh. pg-boss's job table already has the state.
-- [ ] Wrap `getUser` in React `cache()` (`lib/session.ts:11`): `UserMenu` and each page look up the session separately on every request.
-- [ ] Keep the postgres.js client on `globalThis` like `lib/queue.ts` does (`db/index.ts:14`), so dev hot reload doesn't leak connection pools.
+- [x] Wrap `getUser` in React `cache()` (`lib/session.ts:11`): `UserMenu` and each page look up the session separately on every request. **Done:** `getUser` is `cache()`d, so the layout and page share one session lookup per request.
+- [x] Keep the postgres.js client on `globalThis` like `lib/queue.ts` does (`db/index.ts:14`), so dev hot reload doesn't leak connection pools. **Done:** connections stayed at 2 across 5 dev hot reloads.
 - [x] Ingest only clears the embedding when the title or description changes, but `jobDocument` (`lib/embed.ts:36-39`) also includes company and location. Include location in the comparison at `scripts/ingest.mts:29`. **Done in 2.1:** the comparison now covers title, description, company and location (`is not distinct from`, since location can be null); a back-to-back second ingest cleared 0 embeddings.
 
 ---
 
 ## 4. Portfolio polish
 
-- [ ] Per-page titles: `generateMetadata` on `app/jobs/[id]/page.tsx` ("<title> at <company> · Shortlist") and `app/company/[board]/page.tsx`, plus static titles on the other pages.
-- [ ] An OpenGraph image (`app/opengraph-image.tsx`) so LinkedIn and other link previews look right.
+- [x] Per-page titles: `generateMetadata` on `app/jobs/[id]/page.tsx` ("<title> at <company> · Shortlist") and `app/company/[board]/page.tsx`, plus static titles on the other pages. **Done:** title template `%s · Shortlist`; static titles on every page; `generateMetadata` gives "<title> at <company>" on job pages and "<name>: open roles and company brief" on company pages, with "not found" titles for bad ids.
+- [x] An OpenGraph image (`app/opengraph-image.tsx`) so LinkedIn and other link previews look right. **Done:** static 1200×630 image built at build time (company count, eval AUC, $0), default font so the build needs no network; `metadataBase` comes from `BETTER_AUTH_URL`, else Next's Vercel URL fallback.
 - [ ] A 60–90s demo GIF or video in the README (the "Video" roadmap item).
-- [ ] The home page hardcodes "AUC 0.91" (`app/page.tsx:47`); read it from `evals/match/results/latest.json`.
-- [ ] Tidy up: tick the finished checkboxes in `docs/superpowers/plans/2026-11-25-redesign.md` (the redesign shipped in `d35fe26`), and remove the leftover `/* config options here */` in `next.config.ts`.
+- [x] The home page hardcodes "AUC 0.91" (`app/page.tsx:47`); read it from `evals/match/results/latest.json`. **Done:** `lib/eval-summary.ts` computes the lenient AUC from `latest.json` with `evals/metrics.ts` at build time (reproduces 0.91); the OG image uses it too.
+- [x] Tidy up: tick the finished checkboxes in `docs/superpowers/plans/2026-11-25-redesign.md` (the redesign shipped in `d35fe26`), and remove the leftover `/* config options here */` in `next.config.ts`. **Done:** 18 plan steps ticked after checking each shipped; two noted where the code differs from the plan (GitHub link in the footer, `/?q=` redirect in `next.config.ts`). Config comment removed.
 
 ---
 

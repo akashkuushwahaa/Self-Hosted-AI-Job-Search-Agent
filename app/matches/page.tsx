@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -11,6 +12,8 @@ import { TrackButton } from "../track-button";
 import { errorClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../ui";
 import { MarkSeen } from "./mark-seen";
 import { ScoreButton } from "./score-button";
+
+export const metadata: Metadata = { title: "For you" };
 
 export default function MatchesPage() {
   return (

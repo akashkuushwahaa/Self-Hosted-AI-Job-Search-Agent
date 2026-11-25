@@ -19,8 +19,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shortlist",
-  description: "Self-hosted AI job search",
+  // Absolute URLs for the link-preview image. Self-hosted: the public URL auth already needs.
+  // Unset (the Vercel demo): Next uses the Vercel deployment URL.
+  metadataBase: process.env.BETTER_AUTH_URL ? new URL(process.env.BETTER_AUTH_URL) : undefined,
+  title: { default: "Shortlist · self-hosted AI job search", template: "%s · Shortlist" },
+  description: "Self-hosted AI job search: hybrid search over public career boards, local-LLM match scoring, company research and an application tracker. No paid APIs.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

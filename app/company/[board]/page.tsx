@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -10,6 +11,12 @@ import { isFresh } from "@/lib/dossier";
 import { getUser } from "@/lib/session";
 import { linkClass, Muted, PageHeader, Tag } from "../../ui";
 import { ResearchButton } from "./research-button";
+
+// From the curated list, so no query: the title is known as soon as the params are.
+export async function generateMetadata({ params }: PageProps<"/company/[board]">): Promise<Metadata> {
+  const company = companyByBoard((await params).board);
+  return company ? { title: `${company.name}: open roles and company brief` } : { title: "Company not found" };
+}
 
 export default function CompanyPage({ params }: PageProps<"/company/[board]">) {
   return (

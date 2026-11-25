@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,6 +14,14 @@ import { getUser } from "@/lib/session";
 import { cleanReason, toBlocks } from "@/lib/text";
 import { TrackButton } from "../../track-button";
 import { buttonClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../../ui";
+
+export async function generateMetadata({ params }: PageProps<"/jobs/[id]">): Promise<Metadata> {
+  const { id } = await params;
+  if (!z.uuid().safeParse(id).success) return { title: "Job not found" };
+  await connection(); // in-process PGlite (demo) would otherwise query during prerendering
+  const [job] = await db.select({ title: jobs.title, company: jobs.company }).from(jobs).where(eq(jobs.id, id));
+  return job ? { title: `${job.title} at ${job.company}` } : { title: "Job not found" };
+}
 
 export default function JobPage({ params }: PageProps<"/jobs/[id]">) {
   return (

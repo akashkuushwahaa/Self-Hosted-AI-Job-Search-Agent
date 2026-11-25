@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import { Suspense } from "react";
 import { db } from "@/db";
@@ -5,6 +6,8 @@ import { profiles } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { Muted, PageHeader } from "../ui";
 import { ProfileForms } from "./profile-forms";
+
+export const metadata: Metadata = { title: "Profile" };
 
 export default function ProfilePage() {
   return (

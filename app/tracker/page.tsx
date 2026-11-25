@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { inArray } from "drizzle-orm";
 import { Suspense } from "react";
 import { db } from "@/db";
@@ -6,6 +7,8 @@ import { userApplications } from "@/lib/applications";
 import { requireUser } from "@/lib/session";
 import { Muted, PageHeader } from "../ui";
 import { Board } from "./board";
+
+export const metadata: Metadata = { title: "Tracker" };
 
 export default function TrackerPage() {
   return (

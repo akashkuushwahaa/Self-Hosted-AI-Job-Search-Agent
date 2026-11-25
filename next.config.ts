@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   // Resume PDFs are capped at 5 MB in lib/resume.ts; leave room for multipart overhead.
   experimental: { serverActions: { bodySizeLimit: "6mb" } },

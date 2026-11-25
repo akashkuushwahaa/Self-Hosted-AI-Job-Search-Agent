@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
@@ -11,6 +12,8 @@ import { searchJobs } from "@/lib/search";
 import { getUser } from "@/lib/session";
 import { TrackButton } from "../track-button";
 import { buttonClass, inputClass, linkClass, Muted, PageHeader, ScoreBadge } from "../ui";
+
+export const metadata: Metadata = { title: "Jobs" };
 
 const PAGE_SIZE = 25;
 const sortedCompanies = [...companies].sort((a, b) => a.name.localeCompare(b.name)).map((c) => [c.board, c.name] as const);
