@@ -7,10 +7,10 @@ import { notify } from "./progress";
 import { crawl } from "./research";
 
 // Crawls the company's own site, writes the brief, and stores it for every user.
-export async function researchCompany(board: string, userId: string) {
+export async function researchCompany(board: string) {
   const company = companyByBoard(board);
   const step = (step: string, state: "running" | "finished" | "failed" = "running") =>
-    notify({ kind: "research", userId, board, step, state });
+    notify({ kind: "research", board, step, state });
   try {
     if (!company) throw new Error(`unknown company ${board}`);
     const pages = await crawl(company.site, step);

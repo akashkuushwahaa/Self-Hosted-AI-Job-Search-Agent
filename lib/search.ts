@@ -2,6 +2,7 @@ import { and, cosineDistance, desc, inArray, isNotNull, isNull, sql, type SQL } 
 import { db } from "@/db";
 import { jobs, matches } from "@/db/schema";
 import { embed } from "./embed";
+import { relevant, MAX_DISTANCE } from "./relevance";
 import { rrf } from "./rrf";
 
 const CANDIDATES = 100;
@@ -41,21 +42,30 @@ export async function searchJobs(q: string, page: number, pageSize: number, fit?
       db.select(columns).from(jobs).where(where).orderBy(...fitOrder(fit)).limit(pageSize).offset((page - 1) * pageSize),
       db.select({ total: sql<number>`count(*)::int` }).from(jobs).where(where),
     ]);
-    return { rows, total, mode: "fit" as SearchMode, fit: true };
+    return { rows, total, more: false, mode: "fit" as SearchMode, fit: true };
   }
   if (!q) {
     const [rows, [{ total }]] = await Promise.all([
       db.select(columns).from(jobs).where(open).orderBy(desc(jobs.postedAt)).limit(pageSize).offset((page - 1) * pageSize),
       db.select({ total: sql<number>`count(*)::int` }).from(jobs).where(open),
     ]);
-    return { rows, total, mode: "recent" as SearchMode, fit: false };
+    return { rows, total, more: false, mode: "recent" as SearchMode, fit: false };
   }
 
   const query = sql`websearch_to_tsquery('english', ${q})`;
   const keyword = ids(and(open, sql`${doc} @@ ${query}`), desc(sql`ts_rank(${doc}, ${query})`));
   // Search still works without Ollama, just keyword-only.
   const semantic = embed([q], "search_query", 5_000).then(
-    ([v]) => ids(and(open, isNotNull(jobs.embedding)), cosineDistance(jobs.embedding, v)),
+    async ([v]) => {
+      const distance = cosineDistance(jobs.embedding, v);
+      const hits = await db
+        .select({ id: jobs.id, distance: sql<number>`${distance}` })
+        .from(jobs)
+        .where(and(open, isNotNull(jobs.embedding), sql`${distance} < ${MAX_DISTANCE}`))
+        .orderBy(distance)
+        .limit(CANDIDATES);
+      return relevant(hits.map((h) => ({ id: h.id, distance: Number(h.distance) }))).map((h) => h.id);
+    },
     () => null,
   );
   const [kw, sem] = await Promise.all([keyword, semantic]);
@@ -73,6 +83,8 @@ export async function searchJobs(q: string, page: number, pageSize: number, fit?
   return {
     rows: pageIds.map((id) => byId.get(id)!).filter(Boolean),
     total: ranked.length,
+    // The keyword list stops at CANDIDATES, so more jobs may match than we ranked.
+    more: kw.length === CANDIDATES,
     mode: (sem ? "hybrid" : "keyword") as SearchMode,
     fit: Boolean(fit),
   };

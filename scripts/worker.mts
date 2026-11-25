@@ -11,7 +11,7 @@ await boss.work<ScoreJob>(SCORE_QUEUE, async ([job]) => {
 });
 await boss.work<ResearchJob>(RESEARCH_QUEUE, async ([job]) => {
   console.log(`researching ${job.data.board}`);
-  await researchCompany(job.data.board, job.data.userId);
+  await researchCompany(job.data.board);
   console.log(`researched ${job.data.board}`);
 });
 console.log(`worker listening on ${SCORE_QUEUE}, ${RESEARCH_QUEUE}`);

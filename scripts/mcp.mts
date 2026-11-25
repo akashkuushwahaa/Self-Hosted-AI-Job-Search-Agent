@@ -40,8 +40,8 @@ server.registerTool(
     annotations: { readOnlyHint: true },
   },
   async ({ query, limit }) => {
-    const { rows, total, mode } = await searchJobs(query, 1, limit);
-    return json({ mode, total, jobs: rows });
+    const { rows, total, more, mode } = await searchJobs(query, 1, limit);
+    return json({ mode, total, moreMayMatch: more, jobs: rows });
   },
 );
 

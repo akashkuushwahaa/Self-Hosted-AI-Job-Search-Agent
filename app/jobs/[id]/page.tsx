@@ -5,7 +5,8 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { z } from "zod";
 import { db } from "@/db";
-import { applications, companyResearch, jobs, matches } from "@/db/schema";
+import { companyResearch, jobs, matches } from "@/db/schema";
+import { trackedJobIds } from "@/lib/applications";
 import { getProfile } from "@/lib/candidates";
 import { splitSkills } from "@/lib/skills";
 import { getUser } from "@/lib/session";
@@ -40,9 +41,9 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
   const [[job], user] = await Promise.all([db.select().from(jobs).where(eq(jobs.id, id)), getUser()]);
   if (!job) notFound();
 
-  const [[match], [tracked], [brief], profile] = await Promise.all([
+  const [[match], tracked, [brief], profile] = await Promise.all([
     user ? db.select().from(matches).where(and(eq(matches.userId, user.id), eq(matches.jobId, id))) : [],
-    user ? db.select({ jobId: applications.jobId }).from(applications).where(and(eq(applications.userId, user.id), eq(applications.jobId, id))) : [],
+    user ? trackedJobIds(user.id, [id]) : null,
     db.select({ summary: companyResearch.dossier }).from(companyResearch).where(eq(companyResearch.board, job.board)),
     user ? getProfile(user.id) : null,
   ]);
@@ -61,7 +62,7 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
         }
       >
         <div className="flex items-center gap-2">
-          {user && <TrackButton jobId={job.id} tracked={Boolean(tracked)} />}
+          {user && <TrackButton jobId={job.id} tracked={Boolean(tracked?.has(id))} />}
           {job.closedAt ? (
             <Tag>No longer listed</Tag>
           ) : (

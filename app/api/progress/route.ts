@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       ({ unlisten } = await client.listen(PROGRESS_CHANNEL, (payload) => {
         const progress = JSON.parse(payload) as Progress;
         // Research briefs are shared by everyone; scoring progress is private to its owner.
-        if (progress.kind === "research" || progress.userId === user.id) send(`data: ${payload}\n\n`);
+        if (progress.kind === "research" || (progress.kind === "score" && progress.userId === user.id)) send(`data: ${payload}\n\n`);
       }));
       ping = setInterval(() => send(": ping\n\n"), 25_000); // keeps proxies from closing an idle stream
       request.signal.addEventListener("abort", () => {

@@ -35,7 +35,7 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
   const canFit = Boolean(profile && (profile.skills.length || profile.resumeText));
   // Without the local model there's no profile vector; the list falls back to the plain order.
   const fitVector = canFit && wantsFit ? await profileVector(profile!).catch(() => null) : null;
-  const { rows, total, mode, fit } = await searchJobs(q, page, PAGE_SIZE, fitVector && { vector: fitVector, userId: user!.id });
+  const { rows, total, more, mode, fit } = await searchJobs(q, page, PAGE_SIZE, fitVector && { vector: fitVector, userId: user!.id });
   const ids = rows.map((r) => r.id);
   const [tracked, scores] = user ? await Promise.all([trackedJobIds(user.id, ids), matchScores(user.id, ids)]) : [null, null];
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -78,7 +78,7 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
             ? `${total.toLocaleString()} open jobs, best fit for your profile first`
             : mode === "recent"
               ? `${total.toLocaleString()} open jobs, newest first`
-              : `${total.toLocaleString()} matches · ${mode === "hybrid" ? "keyword + semantic" : DEMO ? "keyword only (semantic search in the demo covers the sample searches)" : "keyword only (embedding service unavailable)"}${fit ? ", ranked by fit to your profile" : ""}`}
+              : `${total.toLocaleString()}${more ? "+" : ""} ${total === 1 && !more ? "match" : "matches"} · ${mode === "hybrid" ? "keyword + semantic" : DEMO ? "keyword only (semantic search in the demo covers the sample searches)" : "keyword only (embedding service unavailable)"}${fit ? ", ranked by fit to your profile" : ""}`}
           {canFit && wantsFit && !fit && " · fit ranking needs the local model"}
         </Muted>
         {canFit && (
