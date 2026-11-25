@@ -2,9 +2,13 @@
 
 import { eq } from "drizzle-orm";
 import { refresh } from "next/cache";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db";
+import { user } from "@/db/auth-schema";
 import { matches, profiles } from "@/db/schema";
+import { auth } from "@/lib/auth";
 import { DEMO } from "@/lib/demo";
 import { extractResumeText, ResumeError } from "@/lib/resume";
 import { extractProfile, mergeExtracted } from "@/lib/resume-profile";
@@ -78,4 +82,19 @@ export async function uploadResume(_: FormState, form: FormData): Promise<FormSt
     if (e instanceof ResumeError) return { error: e.message };
     throw e;
   }
+}
+
+// Deletes the account and everything stored for it: the resume text, profile, cached embedding,
+// scores, tracker and sessions all cascade from the user row (db/schema.ts). Company briefs are
+// shared by everyone and stay.
+export async function deleteAccount(_: FormState, form: FormData): Promise<FormState> {
+  if (DEMO) return { error: "The demo account can't be deleted." };
+  const current = await requireUser();
+  if (String(form.get("confirm") ?? "").trim().toLowerCase() !== current.email.toLowerCase()) {
+    return { error: "Type your email exactly to confirm." };
+  }
+  // Sign out first, so the browser's session cookie is cleared along with the session.
+  await auth.api.signOut({ headers: await headers() }).catch(() => {});
+  await db.delete(user).where(eq(user.id, current.id));
+  redirect("/");
 }

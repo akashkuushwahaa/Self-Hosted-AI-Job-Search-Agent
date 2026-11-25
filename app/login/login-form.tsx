@@ -7,7 +7,7 @@ import { buttonClass, errorClass, inputClass as input, labelClass } from "../ui"
 
 const button = `${buttonClass()} w-full`;
 
-export function LoginForm({ githubEnabled }: { githubEnabled: boolean }) {
+export function LoginForm({ githubEnabled, signup }: { githubEnabled: boolean; signup: "open" | "closed" | "invite" }) {
   const router = useRouter();
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [error, setError] = useState<string | null>(null);
@@ -72,13 +72,16 @@ export function LoginForm({ githubEnabled }: { githubEnabled: boolean }) {
           {pending ? "…" : mode === "signUp" ? "Create account" : "Sign in"}
         </button>
       </form>
-      <button
-        type="button"
-        className={`${buttonClass("ghost")} w-full`}
-        onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
-      >
-        {mode === "signIn" ? "New here? Create an account" : "Have an account? Sign in"}
-      </button>
+      {signup !== "closed" && (
+        <button
+          type="button"
+          className={`${buttonClass("ghost")} w-full`}
+          onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
+        >
+          {mode === "signIn" ? "New here? Create an account" : "Have an account? Sign in"}
+        </button>
+      )}
+      {mode === "signUp" && signup === "invite" && <p className="text-center text-xs text-muted">Sign-up on this server is limited to invited emails.</p>}
     </div>
   );
 }

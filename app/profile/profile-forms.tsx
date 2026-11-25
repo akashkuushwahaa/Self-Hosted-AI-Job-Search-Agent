@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { profiles } from "@/db/schema";
 import { buttonClass, errorClass, inputClass as input, labelClass } from "../ui";
-import { saveProfile, uploadResume, type FormState } from "./actions";
+import { deleteAccount, saveProfile, uploadResume, type FormState } from "./actions";
 
 const button = buttonClass();
 
@@ -18,6 +18,7 @@ type Props = { name: string; email: string; profile: typeof profiles.$inferSelec
 export function ProfileForms({ name, email, profile }: Props) {
   const [saveState, save, saving] = useActionState(saveProfile, null);
   const [uploadState, upload, uploading] = useActionState(uploadResume, null);
+  const [deleteState, remove, deleting] = useActionState(deleteAccount, null);
 
   return (
     <div className="mt-8 max-w-2xl space-y-10">
@@ -68,6 +69,21 @@ export function ProfileForms({ name, email, profile }: Props) {
         <div className="flex items-center gap-3">
           <button disabled={uploading} className={button}>{uploading ? "Reading your resume… (about 30s)" : "Upload"}</button>
           <Status state={uploadState} />
+        </div>
+      </form>
+
+      <form action={remove} className="space-y-3 border-t border-border pt-8">
+        <h2 className="font-medium">Delete your account</h2>
+        <p className="text-sm text-muted">
+          Deletes your account, resume text, profile, match scores and tracker from this server. This can&apos;t be undone.
+        </p>
+        <label htmlFor="confirm" className={labelClass}>Type <span className="font-mono">{email}</span> to confirm</label>
+        <input id="confirm" name="confirm" autoComplete="off" spellCheck={false} className={input} />
+        <div className="flex items-center gap-3">
+          <button disabled={deleting} className={`${buttonClass("secondary")} text-red-700 dark:text-red-400`}>
+            {deleting ? "Deleting…" : "Delete my account and data"}
+          </button>
+          <Status state={deleteState} />
         </div>
       </form>
     </div>
