@@ -1,0 +1,86 @@
+# ---------- Secrets & credentials (never commit) ----------
+.env
+.env.*
+*.env
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+*.gpg
+secrets/
+credentials*.json
+service-account*.json
+*-credentials.json
+.npmrc
+.netrc
+.htpasswd
+
+# ---------- Dependencies ----------
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ---------- Build output ----------
+.next/
+out/
+build/
+dist/
+.turbo/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---------- Testing / coverage ----------
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---------- Local databases / data dumps ----------
+pgdata/
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.bak
+
+# ---------- AI / agent local state ----------
+.claude/settings.local.json
+.claude/*.local.*
+.playwright-mcp/
+.superpowers/
+
+# ---------- Caches ----------
+.eslintcache
+.vitest/
+
+# ---------- OS / editor ----------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*~

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: shortlist
+          POSTGRES_PASSWORD: shortlist
+          POSTGRES_DB: shortlist
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U shortlist"
+          --health-interval 2s
+          --health-retries 30
+    env:
+      DATABASE_URL: postgres://shortlist:shortlist@localhost:5432/shortlist
+      BETTER_AUTH_SECRET: ci-only-secret-not-used-anywhere-real
+      BETTER_AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx next typegen # route types that typecheck relies on
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run db:migrate # every migration applies cleanly to an empty database
+      - run: npm run build
