@@ -52,6 +52,19 @@ export const profiles = pgTable("profiles", {
     .$onUpdate(() => new Date()),
 });
 
+// The profile's search vector, so /jobs and /matches don't call Ollama on every page load.
+// Its own table rather than a profiles column, so the demo snapshot (which has no such column)
+// keeps working; the demo replays recorded embeddings instead.
+export const profileEmbeddings = pgTable("profile_embeddings", {
+  userId: text()
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // Hash of the embed model and the exact text embedded: any profile edit, change to profileQuery
+  // or model switch gives a new key, so a stale vector is never used and nothing has to clear it.
+  key: text().notNull(),
+  embedding: vector({ dimensions: 768 }).notNull(),
+});
+
 // LLM fit scores. Deleted whenever the user's profile changes, so a score always reflects the current profile.
 export const matches = pgTable(
   "matches",

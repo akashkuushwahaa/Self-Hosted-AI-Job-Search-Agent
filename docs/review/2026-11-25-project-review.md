@@ -104,9 +104,10 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 - **Fix:** After `npm run build`, start the app with `DEMO_MODE=1` and use Playwright (already installed) to load `/`, `/jobs`, `/jobs?q=frontend internship in India`, `/matches`, `/tracker` and a company page with a brief, failing on console errors. This is the page recruiters see.
 
 ### 3.3 Cache the profile embedding
-- [ ] **Where:** `lib/candidates.ts:19`, `app/jobs/page.tsx:37`, `app/matches/page.tsx`, `app/profile/actions.ts`
+- [x] **Where:** `lib/candidates.ts:19`, `app/jobs/page.tsx:37`, `app/matches/page.tsx`, `app/profile/actions.ts`
 - **Problem:** `/jobs` and `/matches` re-embed the profile through Ollama on every page load, including each pagination click, with up to a 10s timeout.
 - **Fix:** Add a `profiles.embedding vector(768)` column, computed when the profile or resume is saved (or lazily on first use and cleared on save). Demo mode can read it from the snapshot instead of `demo/embeddings.json`.
+- **Done:** Used a separate `profile_embeddings` table (migration 0007) instead of a `profiles.embedding` column: a new `profiles` column would break demo mode until the 16 MB snapshot was rebuilt (see 3.5), because `select().from(profiles)` reads every column. The row is keyed by sha256(embed model + `profileQuery` text), so any profile edit, prompt-format change or model switch misses the cache and re-embeds once; no save path has to clear it. It is filled lazily on first use and cascades on user delete. Demo mode keeps its recorded embeddings (already instant), so the snapshot is unchanged. Measured: `profileVector` went from ~85 ms warm (660 ms cold) to 1–2 ms, and cached pages no longer need Ollama for fit ranking.
 
 ### 3.4 Package the whole app
 - [ ] **Where:** `docker-compose.yml`, new `Dockerfile`

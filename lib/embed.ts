@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { DEMO } from "./demo";
 
 const OLLAMA_URL = process.env.OLLAMA_URL ?? "http://localhost:11434";
-const MODEL = process.env.EMBED_MODEL ?? "nomic-embed-text";
+export const EMBED_MODEL = process.env.EMBED_MODEL ?? "nomic-embed-text";
 
 // nomic-embed-text is trained with these task prefixes; queries and documents must use their own.
 export type Task = "search_query" | "search_document";
@@ -25,7 +25,7 @@ export async function embed(texts: string[], task: Task, timeoutMs = 120_000): P
   const res = await fetch(`${OLLAMA_URL}/api/embed`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, input: texts.map((t) => `${task}: ${t}`) }),
+    body: JSON.stringify({ model: EMBED_MODEL, input: texts.map((t) => `${task}: ${t}`) }),
     signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) throw new Error(`Ollama embed failed: HTTP ${res.status} ${await res.text()}`);

@@ -1,7 +1,9 @@
 import { and, cosineDistance, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { db } from "@/db";
-import { jobs, matches, profiles } from "@/db/schema";
-import { embed } from "./embed";
+import { jobs, matches, profileEmbeddings, profiles } from "@/db/schema";
+import { DEMO } from "./demo";
+import { EMBED_MODEL, embed } from "./embed";
 import { profileQuery } from "./match";
 import { splitSkills } from "./skills";
 import { cleanReason } from "./text";
@@ -15,8 +17,24 @@ export async function getProfile(userId: string) {
 
 type Profile = NonNullable<Awaited<ReturnType<typeof getProfile>>>;
 
-// The profile (headline, roles, skills, resume) as one search vector.
-export const profileVector = async (profile: Profile) => (await embed([profileQuery(profile)], "search_query", 10_000))[0];
+// The profile (headline, roles, skills, resume) as one search vector. Cached per user and keyed
+// on what was embedded, so it costs one Ollama call per profile change rather than one per page.
+export async function profileVector(profile: Profile) {
+  const text = profileQuery(profile);
+  if (DEMO) return (await embed([text], "search_query"))[0]; // recorded, already instant
+  const key = createHash("sha256").update(`${EMBED_MODEL}\n${text}`).digest("hex");
+  const [cached] = await db
+    .select({ embedding: profileEmbeddings.embedding })
+    .from(profileEmbeddings)
+    .where(and(eq(profileEmbeddings.userId, profile.userId), eq(profileEmbeddings.key, key)));
+  if (cached) return cached.embedding;
+  const [embedding] = await embed([text], "search_query", 10_000);
+  await db
+    .insert(profileEmbeddings)
+    .values({ userId: profile.userId, key, embedding })
+    .onConflictDoUpdate({ target: profileEmbeddings.userId, set: { key, embedding } });
+  return embedding;
+}
 
 // Nearest open jobs to the profile by embedding, with this user's LLM score where one exists.
 export async function topCandidates(userId: string, profile: Profile) {
