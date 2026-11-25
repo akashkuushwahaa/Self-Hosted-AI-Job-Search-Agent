@@ -1,0 +1,1242 @@
+{
+  "report": "model qwen2.5:7b, 2120s\n48 pairs: 6 good, 11 partial\n\n                      strict (good)   lenient (good+partial)\nAUC  embedding similarity     0.72            0.71\nAUC  match score              0.95            0.89\nP/R/F1 (>=85 | >=40)          0.00/0.00/0.00   1.00/0.71/0.83\nStated location rules caught  9/9\nNon-skill tags (heuristic)    0/256 (0%)",
+  "results": [
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "5577315d-b46c-4691-a988-06d81a8cf1e9",
+        "title": "Full Stack Product Software Engineer",
+        "company": "Dropbox"
+      },
+      "label": "poor",
+      "note": "5+ yrs, remote Mexico only",
+      "similarity": 0.7792707432383652,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "Remote - Mexico",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js"
+      ],
+      "missingSkills": [
+        "Python",
+        "Back-end development"
+      ],
+      "reason": "The role requires 5+ years of experience, which the candidate does not have. Additionally, the posting is for a remote position in Mexico, which the candidate is not authorized to work in. The candidate has strong frontend skills but lacks the required back-end and Python experience for this role fit. Consider applying for internships or new grad positions that align more closely with their experience and skills, or look for roles that are open to candidates in India or do not require as much experience. Also, explore opportunities in Mexico if the candidate can relocate, but this is currently",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "f6049b0d-a9d7-435c-a038-5918928c675a",
+        "title": "2027 - Software Engineering Intern, AMER",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "must be authorized to work in the US",
+      "locationRule": "Must be authorized to work in the United States.",
+      "similarity": 0.7726842240414941,
+      "roleFit": "same",
+      "requiredYears": 0,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "PostgreSQL"
+      ],
+      "missingSkills": [
+        "Java",
+        "Python (specifically FastAPI)"
+      ],
+      "reason": "The candidate is a good fit for the role as they have relevant frontend and backend skills. However, they are not authorized to work in the United States, which is a requirement for this position. They would need to relocate, which is a significant factor given the location rule of the job posting. Additionally, they lack experience in some specific programming languages required by the job posting, such as Java and Python (FastAPI). The candidate should consider applying for roles that do not have strict location requirements or that align with their authorization status in India. They could,",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "c8ec372d-f6b4-4f87-ba56-bf1c88ac5d57",
+        "title": "Full Stack Product Software Engineer",
+        "company": "Dropbox"
+      },
+      "label": "poor",
+      "note": "5+ yrs, remote Poland only",
+      "similarity": 0.7704087230186394,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "Remote - Poland",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js"
+      ],
+      "missingSkills": [
+        "Python",
+        "on-call work"
+      ],
+      "reason": "The role requires 5+ years of experience, which the candidate does not have. Additionally, the job is remote in Poland, which the candidate is not authorized to work in. The candidate's skills in TypeScript and Tailwind CSS are not explicitly required, but they do have relevant experience in front-end development with Next.js and React. However, the seniority and location requirements are significant barriers to fit for this role at this stage of the candidate's career. Consider roles that are more aligned with the candidate's experience and location flexibility, such as internships or new-GRD",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "2382dc11-623e-4a4c-af24-f5c79eb8331c",
+        "title": "SDE2 - Full Stack",
+        "company": "Sarvam AI"
+      },
+      "label": "partial",
+      "note": "stack fits (Next.js, Python, Postgres), needs 3+ yrs",
+      "similarity": 0.7687839824144415,
+      "roleFit": "different",
+      "requiredYears": 3,
+      "locationFit": "relocate",
+      "locationRule": "Must be based in Bengaluru",
+      "matchedSkills": [
+        "Python",
+        "PostgreSQL",
+        "Next.js",
+        "React",
+        "TypeScript"
+      ],
+      "missingSkills": [
+        "Distributed-systems fundamentals"
+      ],
+      "reason": "The role is backend-heavy and requires 3+ years of backend experience, which the candidate does not have. Additionally, the candidate lacks experience with Kotlin/Compose and distributed systems, and would need to relocate to Bengaluru, which is a significant change from their current location in Ahmedabad, India. However, the candidate has relevant frontend skills and is a final-year student, so they could be a good fit with the right mentorship and training opportunities. Relocation would be a significant factor for the candidate to consider, but their skills in Python, Next.js, and React do",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "c2f1c4d4-f2f3-487c-be10-577f8eaed984",
+        "title": "Software Engineering Intern (2027 Start) - Belgrade",
+        "company": "Databricks"
+      },
+      "label": "partial",
+      "note": "intern fits, relocation to Serbia",
+      "similarity": 0.7677984211466412,
+      "roleFit": "adjacent",
+      "requiredYears": 0,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Belgrade, Serbia",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "Python"
+      ],
+      "missingSkills": [],
+      "reason": "The role is adjacent to the candidate's interests, but the location requirement is a significant barrier. The candidate is based in Ahmedabad, India, and the posting requires them to be based in Belgrade, Serbia. Additionally, while the candidate has some relevant skills, they lack implementation skills with a general purpose programming language and knowledge of algorithms, data structures, and OOP principles, which are core requirements for the role. The candidate may consider applying for remote internships or roles that align more closely with their location and skill set, or they could re",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "fd452364-9b8f-4e39-8d15-0ca5170815ef",
+        "title": "Software Engineering Intern (2027 Start) - Amsterdam",
+        "company": "Databricks"
+      },
+      "label": "partial",
+      "note": "intern fits, relocation to Netherlands",
+      "similarity": 0.7628805038436551,
+      "roleFit": "different",
+      "requiredYears": 0,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Amsterdam, Netherlands",
+      "matchedSkills": [
+        "Python",
+        "Git"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate is a final-year CS student and their skills do not fully match the required programming language and foundational knowledge. Additionally, the role requires a candidate to be based in Amsterdam, Netherlands, which the candidate cannot work from due to their location in Ahmedabad, India. The candidate would need to relocate, which is not allowed by the posting's location rule. Therefore, the fit is poor due to both the required skills and location restrictions. Consider applying for roles that are open to remote work or based in India instead of Amsterdam, Netherlands. Focus on up",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "5b60b16b-8fac-49a6-8690-47d4317c56e2",
+        "title": "Software Engineering Intern (2027 Start) - Aarhus",
+        "company": "Databricks"
+      },
+      "label": "partial",
+      "note": "intern fits, relocation to Denmark",
+      "similarity": 0.7620056096199082,
+      "roleFit": "adjacent",
+      "requiredYears": 0,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Aarhus, Denmark",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "Python"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate is a final-year CS student with relevant frontend and backend skills, but the role requires implementation skills with a general purpose programming language and knowledge of algorithms, data structures, and OOP principles, which the candidate does not currently have. Additionally, the candidate is based in Ahmedabad, India, and the role requires them to be based in Aarhus, Denmark, which is not feasible for the candidate to relocate to within the given timeframe. The role is adjacent to the candidate's interests, but the skills and location requirements are a significant gap for",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "57baacf5-f61b-4735-93a5-0918538c64f1",
+        "title": "Software Engineer Intern (2027)",
+        "company": "Cloudflare"
+      },
+      "label": "partial",
+      "note": "intern fits, in-office Lisbon",
+      "similarity": 0.761459804040814,
+      "roleFit": "adjacent",
+      "requiredYears": 0,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Lisbon, PT",
+      "matchedSkills": [
+        "TypeScript",
+        "JavaScript",
+        "React",
+        "Next.js",
+        "Node.js",
+        "Tailwind CSS",
+        "PostgreSQL",
+        "Python",
+        "Git"
+      ],
+      "missingSkills": [
+        "Go",
+        "Rust",
+        "C/C++"
+      ],
+      "reason": "The candidate is a final-year CS student with relevant frontend and backend skills, but the role is in Lisbon, Portugal, which is not within the candidate's current location flexibility. Additionally, the role requires skills in Go, Rust, and C/C++ that the candidate does not have, making it a stretch for their current skill set. However, the candidate's experience with TypeScript, JavaScript, React, and other relevant technologies makes them a good fit for an adjacent role in software engineering, albeit with some skill gaps and location constraints. The candidate should consider relocating,虽",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "ef930d0b-cd80-4ea3-8e99-2a9c00460635",
+        "title": "Software Development Engineer Intern",
+        "company": "HackerRank"
+      },
+      "label": "good",
+      "note": "6-month SDE intern in Bangalore, 2027",
+      "similarity": 0.7612136752088434,
+      "roleFit": "adjacent",
+      "requiredYears": 0,
+      "locationFit": "relocate",
+      "locationRule": "Must be based in Bangalore",
+      "matchedSkills": [
+        "TypeScript",
+        "JavaScript",
+        "React",
+        "Next.js",
+        "Node.js",
+        "Tailwind CSS",
+        "PostgreSQL",
+        "Python",
+        "Git"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate is a good fit for a software engineering internship, but the role is based in Bangalore, which requires relocation. Additionally, while the candidate has strong frontend and backend skills, the role is full-stack, which might require more experience in this area. The candidate is open to remote work, but the posting specifically requires an onsite presence in Bangalore, making relocation a significant factor in the fit. The candidate's experience aligns well with the technical skills required, but the seniority and location requirements are a mismatch. The candidate should look a",
+      "score": 64
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "e015f752-9f78-4d78-ab5d-30831f41d8ff",
+        "title": "Full Stack Software Engineer, Codex",
+        "company": "OpenAI"
+      },
+      "label": "poor",
+      "note": "experienced hire, US remote",
+      "similarity": 0.7596336717130373,
+      "roleFit": "different",
+      "requiredYears": 0,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in San Francisco",
+      "matchedSkills": [
+        "TypeScript",
+        "JavaScript",
+        "React",
+        "Next.js",
+        "Node.js",
+        "Tailwind CSS",
+        "PostgreSQL",
+        "Python",
+        "Git"
+      ],
+      "missingSkills": [
+        "Rust",
+        "Creativity in reframing problems"
+      ],
+      "reason": "The role is for a full-stack software engineer with experience in Rust and AI-assisted development tools, which the candidate lacks. Additionally, the candidate is based in Ahmedabad, India, while the job requires candidates to be based in San Francisco, making relocation mandatory, which the candidate is open to but not explicitly stated as a requirement in the posting. The candidate's skills in TypeScript, JavaScript, and other frontend technologies are a good match, but the role is more focused on backend and AI development, which is a significant mismatch in terms of the required skills. A",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "4645656d-fb02-44b2-b647-18564cf8b02a",
+        "title": "Sr Software Engineer, EPD Ads",
+        "company": "Pinterest"
+      },
+      "label": "poor",
+      "note": "senior, US",
+      "similarity": 0.6631928965805759,
+      "roleFit": "different",
+      "requiredYears": 4,
+      "locationFit": "blocked",
+      "locationRule": "US based applicants only",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js"
+      ],
+      "missingSkills": [],
+      "reason": "The role requires 4+ years of industry experience and a degree, which the candidate does not meet. Additionally, the position is only open to US-based applicants, which the candidate cannot work from due to their location in Ahmedabad, India. The candidate has relevant frontend skills but lacks the required backend and full-stack experience and educational background for this senior role at Pinterest. The role is also not remote, which is a dealbreaker for the candidate based on the location rule. Given these factors, the fit is poor, and the candidate would need to consider roles that better-",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "3a3a05d8-bb50-4372-8a55-1be591d96d90",
+        "title": "Renewals Analyst",
+        "company": "Stripe"
+      },
+      "label": "poor",
+      "note": "finance role",
+      "similarity": 0.5919364904858259,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "Chicago, IL",
+      "matchedSkills": [
+        "data analytics",
+        "operational workflow management"
+      ],
+      "missingSkills": [],
+      "reason": "The role requires significant experience in operations and sales that the candidate does not have. Additionally, the location is in Chicago, IL, which is not open to the candidate who is based in Ahmedabad, India. The candidate's skills in data analytics and communication are relevant but not enough to compensate for the extensive experience gap and location restriction. Consider roles that are more aligned with their experience and location flexibility, such as internships or entry-level software engineering positions in Ahmedabad, India or remote opportunities in India that do not require a ",
+      "score": 10
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "da054b1d-8ae8-41cc-a8df-2c33bd69a7c8",
+        "title": "Manager, Applied AI Architects",
+        "company": "OpenAI"
+      },
+      "label": "poor",
+      "note": "manager, Tokyo",
+      "similarity": 0.5974435063142902,
+      "roleFit": "different",
+      "requiredYears": 10,
+      "locationFit": "blocked",
+      "locationRule": "Tokyo, Japan (Remote)",
+      "matchedSkills": [
+        "N/A"
+      ],
+      "missingSkills": [
+        "customer-facing technical roles",
+        "leading a complex portfolio",
+        "building partnerships across teams"
+      ],
+      "reason": "The role requires extensive experience in customer-facing technical roles and people management, which the candidate does not have. Additionally, the location is in Tokyo, Japan, which the candidate cannot work from due to their current location in Ahmedabad, India. The candidate's skills are more aligned with software development roles rather than the managerial and technical leadership role described in the job posting. The candidate is also a final-year student, which may not meet the required years of experience for this senior role. Given these factors, the fit is not a good match for the",
+      "score": 0
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "98b6ffc2-646d-4e40-ae70-24b22fb89209",
+        "title": "Staff+ Software Engineer, Billing Platform",
+        "company": "Anthropic"
+      },
+      "label": "poor",
+      "note": "staff+, US",
+      "similarity": 0.6129850796898345,
+      "roleFit": "different",
+      "requiredYears": 8,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in San Francisco, CA | New York City, NY | Seattle, WA",
+      "matchedSkills": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "PostgreSQL",
+        "Git"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate is a final-year CS student with 1 year of experience, which is a significant seniority gap for an 8+ year experience role. Additionally, the location requirement is blocked as the candidate is in Ahmedabad, India, and cannot relocate to the specified locations in the US. The candidate has some relevant frontend skills but lacks the required backend and platform experience, as well as the necessary leadership and domain-specific experience in billing and payments systems. The location requirement is a deal-breaker for this candidate given the posting's restrictions on where the候选人",
+      "score": 0
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "74d8830a-e85e-4b56-8116-41eb21689eea",
+        "title": "Staff Data Scientist, Fraud",
+        "company": "Stripe"
+      },
+      "label": "poor",
+      "note": "staff data scientist",
+      "similarity": 0.5608465791083611,
+      "roleFit": "different",
+      "requiredYears": 10,
+      "locationFit": "blocked",
+      "locationRule": "N/A",
+      "matchedSkills": [
+        "Python",
+        "SQL"
+      ],
+      "missingSkills": [],
+      "reason": "The role is for a Staff Data Scientist with 10+ years of experience, which is significantly beyond the candidate's current level. The candidate's skills in Python and SQL are relevant but not sufficient to meet the extensive requirements of the role. Additionally, the candidate is based in Ahmedabad, India, which does not align with the posting's open location requirement, making relocation necessary, which is not explicitly allowed by the posting's location rule (N/A). The candidate's experience is more aligned with frontend and full-stack development rather than the advanced data science and",
+      "score": 30
+    },
+    {
+      "persona": "intern-frontend-india",
+      "job": {
+        "id": "75eb24f0-2201-4326-8c16-346fcb287693",
+        "title": "Enterprise Account Executive: Platforms (Hunter) - German Speaking ",
+        "company": "Stripe"
+      },
+      "label": "poor",
+      "note": "sales",
+      "similarity": 0.5735558138455992,
+      "roleFit": "different",
+      "requiredYears": 7,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Gurugram",
+      "matchedSkills": [
+        "none"
+      ],
+      "missingSkills": [
+        "Strong presentation skills"
+      ],
+      "reason": "The role is a sales position requiring extensive experience in sales and technical product understanding, which the candidate does not have. Additionally, the location requirement is based in Gurugram, which the candidate cannot meet as they are in Ahmedabad, India. The candidate's skills are in software development rather than sales or technical product management, making this a poor fit for their career aspirations and current skill set. The candidate would need to significantly change their career path to pursue this role, which is not aligned with their current interests or experience. The",
+      "score": 0
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "b460a15c-1a51-4ce0-9af9-a2bb42214c9d",
+        "title": "Senior Platform Engineer",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "must be based in Gurugram",
+      "locationRule": "Must be based in Gurugram",
+      "similarity": 0.835243457650144,
+      "roleFit": "adjacent",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Go",
+        "Kubernetes",
+        "Terraform",
+        "Prometheus",
+        "Grafana"
+      ],
+      "missingSkills": [
+        "Pragmatic, detail-oriented, self-motivated"
+      ],
+      "reason": "The candidate's role is adjacent to the position, as they are a senior backend engineer with experience in backend services and distributed systems, but the job requires additional skills in AI coding agents and platform project management. The candidate is based in Berlin, Germany, which does not meet the location requirement of being based in Gurugram for the hybrid working model. However, the candidate has relevant skills in Go, Kubernetes, and observability, which are key to the role. They would need to relocate to meet the location requirement, which is a significant barrier to fit for a ",
+      "score": 30
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "50cbc569-8205-437f-9b55-45b128f47da6",
+        "title": "Senior Software Engineer, Deployments",
+        "company": "MongoDB"
+      },
+      "label": "partial",
+      "note": "skills fit, US relocation",
+      "similarity": 0.8270846395712124,
+      "roleFit": "adjacent",
+      "requiredYears": 6,
+      "locationFit": "relocate",
+      "locationRule": "Must be based in Boston; Miami; New Jersey; New York City; Princeton; Raleigh; Washington DC",
+      "matchedSkills": [
+        "Go",
+        "Kubernetes",
+        "AWS",
+        "Terraform"
+      ],
+      "missingSkills": [
+        "Python"
+      ],
+      "reason": "The candidate has experience in backend and platform engineering, which is adjacent to the role. They have the required years of experience and relevant skills like Go, Kubernetes, and AWS. However, the candidate is based in Berlin, Germany, and would need to relocate to one of the specified locations in the U.S., which is a significant factor. Additionally, the candidate lacks experience in Python and specific CI/CD pipeline experience, which are key requirements for the role. The candidate's experience in distributed systems and observability is valuable but not directly aligned with the job",
+      "score": 64
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "c3756c3c-5f8c-4420-9558-c8867526bb0e",
+        "title": "Senior Software Engineer",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "JVM stack, must be based in Gurgaon",
+      "locationRule": "Must be based in Gurgaon",
+      "similarity": 0.8057121869114164,
+      "roleFit": "adjacent",
+      "requiredYears": 6,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Java",
+        "Spring Boot",
+        "Kafka",
+        "PostgreSQL"
+      ],
+      "missingSkills": [],
+      "reason": "The role is adjacent to the candidate's experience, but requires specific Java ecosystem and streaming data platform experience that the candidate lacks. Additionally, the candidate cannot relocate to Gurgaon as per the job posting requirements, which is a blocking factor for this application. However, the candidate has relevant backend and distributed systems experience that could be valuable in the role, particularly with their experience in Kubernetes and Go, which are not required but could be beneficial in the context of the job's focus on modernization and tooling development for data迁移中",
+      "score": 30
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "3f2a4693-34b9-4e6a-9e36-9006d76d847c",
+        "title": "Senior Software Engineer, Deployments",
+        "company": "MongoDB"
+      },
+      "label": "partial",
+      "note": "skills fit, Toronto relocation",
+      "similarity": 0.800339568084019,
+      "roleFit": "adjacent",
+      "requiredYears": 6,
+      "locationFit": "relocate",
+      "locationRule": "Must be based in Toronto",
+      "matchedSkills": [
+        "Go",
+        "Kubernetes",
+        "Terraform"
+      ],
+      "missingSkills": [
+        "Python"
+      ],
+      "reason": "The candidate's role is adjacent to the job posting, as both involve backend and platform engineering. However, the required years of experience (6+) and the specific skills in Python, Argo Workflows, and ArgoCD are missing. Additionally, the candidate would need to relocate to Toronto, which is a significant factor given their current location in Berlin, Germany (EU remote welcome). The candidate has strong experience in distributed systems and cloud infrastructure, which are relevant but not fully aligned with the job requirements. Given these factors, the fit is good but not perfect, and a ",
+      "score": 64
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "751c56e3-6c8f-4aba-a914-5ac3d12bc7e1",
+        "title": "Senior Software Engineer - Data Infrastructure",
+        "company": "Sarvam AI"
+      },
+      "label": "partial",
+      "note": "Kafka/Go/K8s fit, Bengaluru relocation",
+      "similarity": 0.7987878203649784,
+      "roleFit": "same",
+      "requiredYears": 2,
+      "locationFit": "relocate",
+      "locationRule": "Must be based in Bengaluru",
+      "matchedSkills": [
+        "Go",
+        "Kafka",
+        "Terraform",
+        "AWS"
+      ],
+      "missingSkills": [
+        "ClickHouse",
+        "dbt",
+        "Airflow",
+        "Kubernetes"
+      ],
+      "reason": "The candidate has relevant experience and skills for the role, but would need to relocate to Bengaluru. They lack some specific skills like ClickHouse, dbt, and Airflow, which are important for the position. Relocation might be a significant factor for the candidate to consider based on their current location in Berlin, Germany (EU remote welcome). However, their background in backend services and distributed systems makes them a strong fit for the role overall, despite the location requirement and missing skills in some areas. The candidate could consider applying and potentially negotiating,",
+      "score": 65
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "2a7082c8-d8ab-4cbd-ba29-fdeab56f023e",
+        "title": "Senior Software Engineer, Atlas Clusters Platform",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "must be based in NYC area",
+      "locationRule": "Must be based in the NYC area and would like a hybrid or in-office working model.",
+      "similarity": 0.7964102055744661,
+      "roleFit": "adjacent",
+      "requiredYears": 6,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Go",
+        "AWS",
+        "Terraform"
+      ],
+      "missingSkills": [],
+      "reason": "The role is adjacent to the candidate's desired role, but the required years of experience (6) are slightly less than the candidate's experience (8). The location is a significant mismatch, as the candidate is based in Berlin, Germany, and the job requires being based in the NYC area. The candidate has relevant skills but lacks experience with a major cloud provider technology and leading a new module in production.",
+      "score": 30
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "cd829383-836a-44e3-ab9a-d6c29338d77c",
+        "title": "Platform Engineer - Compute",
+        "company": "Supabase"
+      },
+      "label": "good",
+      "note": "Go, AWS, K8s, remote global",
+      "similarity": 0.795680320300158,
+      "roleFit": "same",
+      "requiredYears": 5,
+      "locationFit": "works",
+      "locationRule": "Fully Remote",
+      "matchedSkills": [
+        "Go",
+        "PostgreSQL",
+        "Terraform",
+        "Kubernetes"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in backend and platform engineering, including Go, Kubernetes, and Terraform. However, the job posting requires strong software engineering skills in Go and Typescript, experience with cloud infrastructure and distributed systems, and specific Kubernetes experience that the candidate lacks. The candidate can work remotely, which fits the job's requirements. The candidate should focus on acquiring the missing skills to better match the job requirements, particularly in Go and Typescript, and gain more experience with cloud infrastructure and Kubernetes. A 6",
+      "score": 65
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "c7e63fa6-7548-453b-97e8-fd3dc2ab315c",
+        "title": "Senior Software Engineer",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "must be based in NYC",
+      "locationRule": "Must be based in New York City",
+      "similarity": 0.7948250503910586,
+      "roleFit": "same",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Go",
+        "Kubernetes",
+        "PostgreSQL",
+        "Terraform",
+        "Distributed systems",
+        "Observability"
+      ],
+      "missingSkills": [
+        "Java",
+        "Linux",
+        "Web application stack"
+      ],
+      "reason": "The role is a good fit for the candidate's experience and skills, but the location requirement is a significant barrier as the candidate is based in Berlin, Germany. The candidate would need to relocate to New York City, which the posting does not allow for remote work. Additionally, the candidate lacks some of the required skills in Java and Linux, which are important for the role, and the web application stack, though not explicitly stated, is implied by the responsibilities. The candidate has strong backend and distributed systems experience, but the specific skills and location requirement",
+      "score": 30
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "3d1a2c6e-c1b0-4a52-ac1e-fcac14d7ce5a",
+        "title": "Staff Engineer",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "JVM stack, must be based in Gurugram",
+      "locationRule": "must be based in Gurugram",
+      "similarity": 0.791624838632526,
+      "roleFit": "adjacent",
+      "requiredYears": 8,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Java",
+        "Spring Boot",
+        "Kafka",
+        "Debezium"
+      ],
+      "missingSkills": [
+        "Relational data modeling"
+      ],
+      "reason": "The candidate has experience in Java and Spring Boot, which are key skills for the role. However, the role requires extensive experience with relational data modeling and SQL databases, which the candidate does not have. Additionally, the candidate is based in Berlin, Germany, which does not meet the location requirement of being based in Gurugram, India. These factors make the fit a good but not perfect match for the role, with a seniority level that aligns well but a few missing core skills and a location mismatch that cannot be overcome. The candidate may be a good fit for a similar role in",
+      "score": 30
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "d882458b-9afd-4a3f-a48d-97bab4231a73",
+        "title": "Software Engineer 3",
+        "company": "MongoDB"
+      },
+      "label": "partial",
+      "note": "Go + K8s fit, must move to Ireland",
+      "similarity": 0.7894545684791289,
+      "roleFit": "same",
+      "requiredYears": 5,
+      "locationFit": "relocate",
+      "locationRule": "Based in Dublin, Cork, or remotely within Ireland",
+      "matchedSkills": [
+        "Go",
+        "Kubernetes",
+        "Distributed systems",
+        "Observability"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has the required skills and experience in backend and platform engineering, which aligns well with the role. However, they would need to relocate to Dublin, Cork, or work remotely within Ireland, which is a significant factor given their current location in Berlin, Germany. The candidate has relevant experience in distributed systems and observability, which are key areas for the role, but lacks specific experience with Kubernetes controllers and operators, which is a critical requirement for this position. Relocating or working remotely within Ireland would be necessary to fit a",
+      "score": 65
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "dde32059-aedb-451e-b97f-97933a23cbb2",
+        "title": "Business Development Lead, VC/PE",
+        "company": "Databricks"
+      },
+      "label": "poor",
+      "note": "business development",
+      "similarity": 0.6457318429839978,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "If access to export-controlled technology or source code is required for performance of job duties, it is within Employer's discretion whether to apply for a U.S. government license for such positions, and Employer may decline to proceed with an applicant on this basis alone.",
+      "matchedSkills": [],
+      "missingSkills": [
+        "CRM proficiency",
+        "Partnership tracking",
+        "Event automation",
+        "Data dashboards"
+      ],
+      "reason": "The candidate's background is in backend and platform engineering, which is different from the business development role required. Additionally, the candidate does not have the necessary sales and relationship-building experience, and the job location in the US is not open to the candidate based on the posting's rules. The required skills in sales, customer relationships, and technical communication are not present in the candidate's profile, making this a poor fit overall for the role posted at Databricks. The candidate would need to significantly change their career path and location to be a",
+      "score": 0
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "c6214170-f721-4e75-ac91-13808ab056ae",
+        "title": "Account Executive, Money Management- Issuing and Treasury",
+        "company": "Stripe"
+      },
+      "label": "poor",
+      "note": "sales",
+      "similarity": 0.5981600630329126,
+      "roleFit": "different",
+      "requiredYears": 6,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Singapore",
+      "matchedSkills": [],
+      "missingSkills": [],
+      "reason": "The candidate is a senior backend and platform engineer with extensive technical experience, but the job posting is for a sales role in Singapore. The candidate lacks the required sales experience and language proficiency. Additionally, the location requirement is a significant barrier as the candidate is based in Berlin, Germany, and cannot relocate to Singapore according to the posting's rules. This role is not a fit for the candidate's background and interests, and the location is not flexible for the candidate to work remotely from the EU. The candidate would need to significantly change赛道",
+      "score": 0
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "97d5af0a-1eaa-40c7-9c52-3959f7698f2b",
+        "title": "Software Development Engineer 3, Samvaad",
+        "company": "Sarvam AI"
+      },
+      "label": "partial",
+      "note": "senior engineering, Bengaluru relocation",
+      "similarity": 0.7384262738068037,
+      "roleFit": "adjacent",
+      "requiredYears": 5,
+      "locationFit": "relocate",
+      "locationRule": "Must be based in Bengaluru",
+      "matchedSkills": [
+        "Go",
+        "PostgreSQL",
+        "Kubernetes",
+        "Terraform",
+        "gRPC",
+        "Distributed systems",
+        "Observability"
+      ],
+      "missingSkills": [
+        "Python"
+      ],
+      "reason": "The candidate has strong backend and platform engineering skills, including Go, Kubernetes, and PostgreSQL, which align well with the job requirements. However, the role requires specific experience with Python and major cloud platforms, which the candidate lacks. Additionally, the candidate would need to relocate to Bengaluru, which is a significant factor to consider. The candidate's experience in distributed systems and observability is relevant, but the role also requires additional technical skills that the candidate does not currently possess, making it a good fit with some gaps to fill.",
+      "score": 64
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "2b2cbff0-1e57-4d78-aab6-73c1bb50382e",
+        "title": "Director, Regional Sales",
+        "company": "GitLab"
+      },
+      "label": "poor",
+      "note": "sales",
+      "similarity": 0.6400288543868361,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "Remote, Japan",
+      "matchedSkills": [],
+      "missingSkills": [
+        "Sales",
+        "Account Management",
+        "Customer Success",
+        "Marketing",
+        "Product",
+        "Engineering",
+        "Operations"
+      ],
+      "reason": "The candidate is a senior backend and platform engineer with extensive experience in backend services and distributed systems, but the role is for a Director of Regional Sales in Japan. The candidate lacks the required sales, account management, and cross-functional collaboration skills needed for this position. Additionally, the role is remote in Japan, which is not a location the candidate can work from based on the provided information. The candidate would need to relocate, which is not allowed by the posting's location rule. Therefore, the fit is poor due to the mismatch in role, location,",
+      "score": 0
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "7df4bca2-b9f4-4a64-b56b-1f258c9b34af",
+        "title": "Engineering Manager I, Commercial Audit",
+        "company": "Datadog"
+      },
+      "label": "poor",
+      "note": "engineering manager, NYC",
+      "similarity": 0.6611080662074639,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "Must be eligible for any required authorizations from the US government.",
+      "matchedSkills": [
+        "Go",
+        "Kubernetes",
+        "PostgreSQL",
+        "Terraform"
+      ],
+      "missingSkills": [],
+      "reason": "The role is for an Engineering Manager in Commercial Audit, which is a different function from the candidate's desired backend and platform engineering roles. The required years of experience and the location requirement are also significant barriers. While the candidate has relevant technical skills, the lack of experience in security engineering, GRC, or risk management, and the need for US government authorization make this a poor fit for the candidate's profile and goals. The candidate would need to relocate to the US, which is not an option for them based on the location rule. The missing",
+      "score": 12
+    },
+    {
+      "persona": "senior-backend-europe",
+      "job": {
+        "id": "b176b911-cc73-47a9-a529-24fb14ce1937",
+        "title": "Ecosystem Startups, Account Director",
+        "company": "OpenAI"
+      },
+      "label": "poor",
+      "note": "sales",
+      "similarity": 0.6814291411311928,
+      "roleFit": "different",
+      "requiredYears": 6,
+      "locationFit": "blocked",
+      "locationRule": "Bangalore - Remote",
+      "matchedSkills": [
+        "Go",
+        "PostgreSQL",
+        "Terraform"
+      ],
+      "missingSkills": [
+        "field marketing",
+        "online events",
+        "content creation",
+        "API and ChatGPT adoption",
+        "startup lifecycle campaigns",
+        "APAC market segmentation"
+      ],
+      "reason": "The candidate's background is in backend and platform engineering, while the role requires extensive experience in growth marketing, lifecycle marketing, and field marketing. Additionally, the candidate is based in Berlin, Germany, which does not align with the Bangalore-based remote position requirement of the job posting. The candidate has some relevant technical skills but lacks the required marketing and strategic experience for this role, and the location is a significant barrier to employment for the candidate as well. Given these factors, the fit is not strong enough to recommend this, ",
+      "score": 25
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "59112706-6351-4a43-9e9d-a1f085621611",
+        "title": "Machine Learning Engineer (L3)",
+        "company": "Twilio"
+      },
+      "label": "poor",
+      "note": "must be based in India",
+      "locationRule": "This role will be remote, and based in India - Karnataka, Tamil Nadu, Telangana State, Maharashtra and New Delhi.",
+      "similarity": 0.7908396168862486,
+      "roleFit": "same",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Python",
+        "LLMs",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in machine learning and Python, but lacks the required experience in cloud-based services and production-grade ML/AI systems. The role is remote and based in India, which the candidate would need to relocate for. The candidate's experience aligns well with the role, but the seniority requirement of 5+ years is a stretch given their 4 years of experience. The candidate should consider applying and highlighting their relevant experience while addressing the missing skills in their application or resume. Relocation to India would be required for this position",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "a0e14ffa-6802-405b-bb8e-5f7836539f7d",
+        "title": "Machine Learning Engineer, Implicit Signals",
+        "company": "OpenAI"
+      },
+      "label": "good",
+      "note": "MLE at SF, LLM signals",
+      "similarity": 0.7881893615052344,
+      "roleFit": "same",
+      "requiredYears": 3,
+      "locationFit": "works",
+      "locationRule": "Must be authorized to work in the United States.",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "RAG",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in machine learning, particularly with LLMs and fine-tuning, which aligns well with the role. However, the posting requires more experience in production deployment and software engineering, which the candidate lacks. The candidate can work in San Francisco, CA, where the role is based, and the role is remote, which fits the candidate's location. The candidate should focus on gaining more experience in production ML systems and software engineering to better match the role requirements. Given the candidate's experience and the role's requirements, the fit评",
+      "score": 65
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "9ff3149a-adff-4bfc-9379-4381c1c9adde",
+        "title": "Software Engineer - Machine Learning",
+        "company": "Figma"
+      },
+      "label": "good",
+      "note": "applied ML, US, 5+ yrs a one-level stretch",
+      "similarity": 0.7876373152550528,
+      "roleFit": "same",
+      "requiredYears": 5,
+      "locationFit": "works",
+      "locationRule": "Must be authorized to work in the United States.",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "RAG",
+        "Model evaluation",
+        "Fine-tuning",
+        "Spark",
+        "SQL",
+        "AWS SageMaker"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has the required skills for the role, including experience with Python, PyTorch, and LLMs, and is based in San Francisco, CA, which fits the location requirement. However, the candidate may need to gain more experience in end-to-end ML model development and building scalable data pipelines to fully meet the job requirements. The candidate has 4 years of experience, which is close to the 5+ years required, and they can likely bridge this gap with additional experience or training. The candidate should consider applying and highlighting their relevant experience and willingness to ",
+      "score": 65
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "60887d69-dea1-4258-bc5c-49d4d4e1582c",
+        "title": "Staff Machine Learning Engineer ",
+        "company": "Databricks"
+      },
+      "label": "good",
+      "note": "2-8 yrs, LLM fine-tuning, RAG, SF",
+      "similarity": 0.7828627691401091,
+      "roleFit": "same",
+      "requiredYears": 2,
+      "locationFit": "works",
+      "locationRule": "Must be authorized to work in the United States.",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "RAG",
+        "Fine-tuning",
+        "Model evaluation"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has 4 years of experience in machine learning and relevant skills like Python, PyTorch, and LLMs, making them a good fit for the role. However, they lack specific experience with LLM fine-tuning, prompt engineering, and RAG, which is a key requirement. The candidate can work in San Francisco, CA, where the job is based, and they are authorized to work in the United States. They would need to gain experience in the missing skills to fully meet the job requirements, but their background is strong overall. The candidate should focus on acquiring this specific experience to better be",
+      "score": 65
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "735e1d68-c5b2-4e30-9a43-8e9f6f00c142",
+        "title": "Senior Applied ML Engineer - ML4Sys ",
+        "company": "Databricks"
+      },
+      "label": "good",
+      "note": "4+ yrs applied ML, SF",
+      "similarity": 0.776933362375519,
+      "roleFit": "adjacent",
+      "requiredYears": 4,
+      "locationFit": "works",
+      "locationRule": "Must be based in San Francisco, California",
+      "matchedSkills": [
+        "Python",
+        "LLMs",
+        "Fine-tuning",
+        "Model evaluation"
+      ],
+      "missingSkills": [
+        "Scala",
+        "Java",
+        "Advanced Education",
+        "Systems Domain",
+        "Optimization"
+      ],
+      "reason": "The candidate has relevant experience and skills for a Senior Applied ML Engineer role, but the posting requires additional skills in systems domain knowledge and optimization. The candidate is based in San Francisco, which fits the location requirement. However, the candidate may need to acquire some of the preferred skills to fully match the role requirements, such as Scala, Java, and advanced education in AI or related fields. The candidate's experience in fine-tuning and model evaluation is a strong match for the role's responsibilities, but the role also requires a broader set of skills, ",
+      "score": 64
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "1cda2be8-b760-4493-b679-b94ddc34d8b8",
+        "title": "Staff Machine Learning Engineer (L4)",
+        "company": "Twilio"
+      },
+      "label": "poor",
+      "note": "8+ yrs, must be based in India",
+      "locationRule": "This role will be remote, and based in India - Karnataka, Tamil Nadu, Telangana State, Maharashtra and New Delhi.",
+      "similarity": 0.7757109445962664,
+      "roleFit": "adjacent",
+      "requiredYears": 8,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Python",
+        "LLMs",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in machine learning and Python, but lacks the required years of experience and specific cloud-based services experience. Additionally, the role requires relocation to India, which is a significant factor for the candidate based in San Francisco, CA. The candidate would need to acquire new technical skills and possibly relocate to fit this role well. However, the adjacent role and skills match make it a viable option for the candidate to consider with some adjustments and relocation. Score: 65-84 (good fit with one real gap).",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "ee01ff31-3d83-4446-9437-718519717561",
+        "title": "Machine Learning Engineer 2",
+        "company": "Twilio"
+      },
+      "label": "poor",
+      "note": "not eligible for hire in the SF area",
+      "locationRule": "This role will be remote, but is not eligible to be hired in San Francisco, CA, Oakland, CA, San Jose, CA, or the surrounding areas.",
+      "similarity": 0.7726262060155707,
+      "roleFit": "same",
+      "requiredYears": 2,
+      "locationFit": "blocked",
+      "matchedSkills": [
+        "Python",
+        "LLMs",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in machine learning and LLMs, and the role is remote, which fits the candidate's location. However, the candidate lacks experience with Go and event-streaming systems, which are desired skills. The candidate's experience with Python and fine-tuning aligns well with the job requirements, but the missing skills could be a stretch for the candidate's current level of experience. The candidate should consider applying and highlighting their transferable skills and willingness to learn new technologies. The role is remote, which is a good fit for the candidate,",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "2d1c8b93-7d40-4bf8-9799-7ab676c49ac0",
+        "title": "Staff Software Engineer, Machine Learning (Consumer Revenue)",
+        "company": "Discord"
+      },
+      "label": "poor",
+      "note": "8+ yrs staff vs 4 yrs: two levels",
+      "similarity": 0.77077874272764,
+      "roleFit": "adjacent",
+      "requiredYears": 8,
+      "locationFit": "works",
+      "locationRule": "Must be based in the Bay Area",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "Fine-tuning"
+      ],
+      "missingSkills": [
+        "Built internal ML platform/tooling"
+      ],
+      "reason": "The candidate has relevant experience in machine learning and some of the required skills, but the role requires significantly more experience and additional specific skills that the candidate does not have. The candidate would need to relocate to the Bay Area, which is a significant factor given the location requirement of the job posting. The candidate's experience aligns more with a mid-level or entry-level role rather than a staff-level position as required by the posting. However, the candidate's background in ML and LLMs is promising and could be a good fit for a more junior or mid-level",
+      "score": 39
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "0cee2420-e0a1-42d1-a86b-0a4790fe6978",
+        "title": "Principal, Machine Learning Engineer (L5)",
+        "company": "Twilio"
+      },
+      "label": "poor",
+      "note": "10+ yrs, India",
+      "similarity": 0.7701087438545041,
+      "roleFit": "adjacent",
+      "requiredYears": 10,
+      "locationFit": "blocked",
+      "locationRule": "This role will be remote, and based in India - Karnataka, Tamil Nadu, Telangana State, Maharashtra and New Delhi.",
+      "matchedSkills": [
+        "Python",
+        "LLMs",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in machine learning and some of the required skills, but the role requires significantly more experience and specific technical expertise that the candidate does not have. Additionally, the role is based in India, which is a relocation requirement for the candidate who is currently in San Francisco, CA. The candidate may be a good fit for a more junior or adjacent role within Twilio or another company with similar requirements but a more suitable location or experience level match.",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "200e758b-2c06-4454-b84d-e8567b808a88",
+        "title": "Principal Machine Learning Engineer- LLM Fine-tuning and Optimization ",
+        "company": "Airbnb"
+      },
+      "label": "poor",
+      "note": "10+ yrs principal",
+      "similarity": 0.7675024008146624,
+      "roleFit": "adjacent",
+      "requiredYears": 10,
+      "locationFit": "works",
+      "locationRule": "Must live in a state where Airbnb, Inc. has a registered entity. Click here for the up-to-date list of excluded states.",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "Fine-tuning",
+        "Model evaluation"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate has relevant experience in machine learning and fine-tuning models, but the role requires significantly more experience and a PhD, which the candidate does not have. The location is also a potential issue as the candidate must live in a state where Airbnb has a registered entity, which may not be the case for San Francisco, CA. However, the role is remote eligible, so this is not a major barrier. The candidate's skills in Python, PyTorch, and LLMs are well-aligned with the job requirements, but the seniority and educational requirements are a significant gap. The candidate may be",
+      "score": 39
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "33fc0713-0ee7-4f16-937e-74426cde7e31",
+        "title": "Regional Marketing Manager, Japan",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "marketing",
+      "similarity": 0.557697178210951,
+      "roleFit": "different",
+      "requiredYears": 8,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Tokyo",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "RAG",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate's background is in machine learning engineering, which is a different role from the marketing manager position. Additionally, the candidate is based in San Francisco, CA, which does not meet the location requirement of being based in Tokyo. The candidate lacks the required years of experience and specific marketing skills needed for the role, making it a poor fit overall for the job posting provided. The candidate would need to significantly change their career path and move to a new location to be considered for this role, which is not feasible given the current requirements and",
+      "score": 0
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "65fba4d7-23c2-48ce-9f9d-6e48671b0a41",
+        "title": "Head of Community Relations, Compute",
+        "company": "Anthropic"
+      },
+      "label": "poor",
+      "note": "community relations",
+      "similarity": 0.6002996906390737,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "works",
+      "locationRule": "Must be based in San Francisco, CA or New York City, NY",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "RAG",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [],
+      "reason": "The candidate's background in machine learning is not a fit for the role, which requires experience in program management, negotiation, and community relations. While the candidate has relevant technical skills, the required years of experience and specific experience in the domain of community benefits and data center development are missing. The candidate would need to relocate to San Francisco or New York City, which is acceptable, but the role is a significant shift in function and seniority from their current interests and experience. The candidate may want to consider roles that are more",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "0326d019-df0c-4ce4-9822-8ea741461d28",
+        "title": "Software Engineer, API Agents",
+        "company": "OpenAI"
+      },
+      "label": "partial",
+      "note": "adjacent: SWE on agents, SF",
+      "similarity": 0.6845816705342157,
+      "roleFit": "adjacent",
+      "requiredYears": 7,
+      "locationFit": "works",
+      "locationRule": "Must be based in San Francisco",
+      "matchedSkills": [
+        "Python",
+        "fine-tuning",
+        "LLMs",
+        "Model evaluation"
+      ],
+      "missingSkills": [
+        "exceptional backend engineering fundamentals"
+      ],
+      "reason": "The candidate has relevant experience and skills in machine learning and backend engineering, but the role requires more years of experience and a broader set of backend engineering fundamentals. The candidate can work in San Francisco, but the role's requirements exceed their current experience level and scope of skills. The candidate should consider roles with more aligned experience requirements or seek to gain additional experience and skills in backend engineering and systems design to better fit this role. The candidate's skills in Python, fine-tuning, and LLMs are strong and relevant,但仍",
+      "score": 64
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "797d7ff1-cb68-46ad-8f0f-9b6ffe837b1e",
+        "title": "Public Sector Strategic Account Executive, DoW",
+        "company": "GitLab"
+      },
+      "label": "poor",
+      "note": "sales",
+      "similarity": 0.6284999076927571,
+      "roleFit": "different",
+      "requiredYears": 5,
+      "locationFit": "blocked",
+      "locationRule": "Must be authorized to work in the United States.",
+      "matchedSkills": [
+        "Python",
+        "PyTorch",
+        "LLMs",
+        "RAG",
+        "Model evaluation",
+        "Fine-tuning"
+      ],
+      "missingSkills": [
+        "Understanding of compliance requirements",
+        "Consultative sales approach"
+      ],
+      "reason": "The candidate's background is in machine learning engineering, which is a different function from the strategic account executive role. They have the technical skills required but lack the necessary sales and business development experience. Additionally, the candidate is not authorized to work in the United States, which is a requirement for this role. This role is also remote, but the candidate is based in San Francisco, CA, making relocation necessary, which is not explicitly allowed by the posting's location rule. Given these factors, the fit is poor, and the candidate would need to either",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "e7ced30e-0fbe-4ca3-ad0d-12183567415e",
+        "title": "Enterprise Customer Success Manager (German Speaking)",
+        "company": "Datadog"
+      },
+      "label": "poor",
+      "note": "customer success",
+      "similarity": 0.5970999740660965,
+      "roleFit": "different",
+      "requiredYears": 3,
+      "locationFit": "blocked",
+      "locationRule": "Must be based in Gurugram",
+      "matchedSkills": [
+        "Python",
+        "LLMs",
+        "RAG",
+        "Fine-tuning"
+      ],
+      "missingSkills": [
+        "Customer Success",
+        "Account Management"
+      ],
+      "reason": "The role is in Customer Success, which is a different function from the candidate's desired roles in Machine Learning Engineering. The posting requires 3+ years of experience in Customer Success or Account Management, which the candidate does not have. Additionally, the candidate cannot work in Gurugram, as the posting requires candidates to be based there, which is a location restriction the candidate does not meet. The candidate has some relevant technical skills but lacks the required experience and function-specific skills for this role. Given these factors, the fit is poor, and the role's",
+      "score": 30
+    },
+    {
+      "persona": "ml-engineer-us",
+      "job": {
+        "id": "1f85ed1c-75eb-41e7-9516-b2f0a79939c6",
+        "title": "Senior Technical Project Manager",
+        "company": "MongoDB"
+      },
+      "label": "poor",
+      "note": "project manager",
+      "similarity": 0.6630656049088839,
+      "roleFit": "different",
+      "requiredYears": 10,
+      "locationFit": "blocked",
+      "locationRule": "must be based in Germany",
+      "matchedSkills": [
+        "SCRUM/Kanban processes",
+        "Project management"
+      ],
+      "missingSkills": [
+        "Professional fluency in German"
+      ],
+      "reason": "The role is for a Senior Technical Project Manager with extensive experience in project management and enterprise-scale software solutions, which is significantly beyond the candidate's current experience. Additionally, the candidate is based in San Francisco, CA, and the job requires candidates to be based in Germany, which is a location mismatch. The candidate has some relevant skills but lacks the required years of experience and the necessary language proficiency for the role in Germany. The role is also not aligned with the candidate's desired roles in machine learning engineering or AI,故",
+      "score": 30
+    }
+  ]
+}
