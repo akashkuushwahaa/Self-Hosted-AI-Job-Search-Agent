@@ -8,6 +8,7 @@ import { client, db } from "../db";
 import { user } from "../db/auth-schema"; // star re-exports from schema.ts aren't visible to ESM scripts under tsx
 import { applications, companyResearch, jobs, matches, profiles } from "../db/schema";
 import { companies, companyByBoard } from "../lib/companies";
+import { COUNTRY_OPTIONS, filterParams, LEVELS, type Level } from "../lib/filters";
 import { splitSkills } from "../lib/skills";
 import { cleanReason } from "../lib/text";
 import { searchJobs } from "../lib/search";
@@ -35,13 +36,25 @@ const server = new McpServer({ name: "shortlist", version: "0.1.0" });
 server.registerTool(
   "search_jobs",
   {
-    description: "Search open jobs from company career boards. Combines keyword and semantic search; supports quotes and -exclusions.",
-    inputSchema: { query: z.string().min(1).max(200), limit: z.number().int().min(1).max(25).default(10) },
+    description:
+      "Search open jobs from company career boards. Combines keyword and semantic search; supports quotes and -exclusions. " +
+      "Optional filters narrow by level (from the title), country or remote (from the location), company board and posting age. " +
+      "Leave query empty to list the newest jobs matching the filters.",
+    inputSchema: {
+      query: z.string().max(200).default(""),
+      limit: z.number().int().min(1).max(25).default(10),
+      level: z.enum(Object.keys(LEVELS) as [Level, ...Level[]]).optional().describe("intern, entry (new grad / junior) or senior (senior and above)"),
+      country: z.enum(COUNTRY_OPTIONS.map((c) => c.code) as [string, ...string[]]).optional().describe("ISO country code"),
+      remote: z.boolean().optional(),
+      company: z.enum(companies.map((c) => c.board) as [string, ...string[]]).optional().describe("Company board id, as in job results"),
+      postedWithinDays: z.union([z.literal(1), z.literal(7), z.literal(30)]).optional(),
+    },
     annotations: { readOnlyHint: true },
   },
-  async ({ query, limit }) => {
-    const { rows, total, more, mode } = await searchJobs(query, 1, limit);
-    return json({ mode, total, moreMayMatch: more, jobs: rows });
+  async ({ query, limit, level, country, remote, company, postedWithinDays }) => {
+    const filters = { remote: remote ?? false, country: country ?? null, company: company ?? null, postedDays: postedWithinDays ?? null, level: level ?? null };
+    const { rows, total, more, mode } = await searchJobs(query.trim(), 1, limit, null, filters);
+    return json({ mode, total, moreMayMatch: more, filters: filterParams(filters), jobs: rows });
   },
 );
 

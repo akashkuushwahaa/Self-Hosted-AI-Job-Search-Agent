@@ -1,16 +1,36 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { matchScores, trackedJobIds } from "@/lib/applications";
 import { getProfile, profileVector } from "@/lib/candidates";
 import { companies } from "@/lib/companies";
 import { DEMO, DEMO_QUERIES } from "@/lib/demo";
+import { COUNTRY_OPTIONS, filterParams, hasFilters, LEVELS, parseFilters, POSTED } from "@/lib/filters";
 import { searchJobs } from "@/lib/search";
 import { getUser } from "@/lib/session";
 import { TrackButton } from "../track-button";
-import { buttonClass, inputClass, Muted, PageHeader, ScoreBadge } from "../ui";
+import { buttonClass, inputClass, linkClass, Muted, PageHeader, ScoreBadge } from "../ui";
 
 const PAGE_SIZE = 25;
+const sortedCompanies = [...companies].sort((a, b) => a.name.localeCompare(b.name)).map((c) => [c.board, c.name] as const);
+
+function FilterSelect({ name, label, value, any, options }: { name: string; label: string; value: string | null; any: string; options: readonly (readonly [string, string])[] }) {
+  return (
+    <>
+      <label htmlFor={`filter-${name}`} className="sr-only">{label}</label>
+      <select
+        id={`filter-${name}`}
+        name={name}
+        defaultValue={value ?? ""}
+        className={`h-8 rounded-md border border-border bg-background px-2 text-xs focus-visible:outline-2 focus-visible:outline-accent ${value ? "text-foreground" : "text-muted"}`}
+      >
+        <option value="">{any}</option>
+        {options.map(([v, text]) => <option key={v} value={v}>{text}</option>)}
+      </select>
+    </>
+  );
+}
 
 export default function JobsPage({ searchParams }: PageProps<"/jobs">) {
   return (
@@ -25,9 +45,16 @@ export default function JobsPage({ searchParams }: PageProps<"/jobs">) {
 
 async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams">) {
   const params = await searchParams;
+  // The filter form submits every field, empty or not; drop the empty ones so shared URLs stay clean.
+  if (Object.values(params).some((v) => v === "")) {
+    const clean = Object.entries(params).filter((e): e is [string, string] => typeof e[1] === "string" && e[1] !== "");
+    redirect(`/jobs${clean.length ? `?${new URLSearchParams(clean)}` : ""}`);
+  }
   const q = typeof params.q === "string" ? params.q.trim() : "";
   const page = Math.max(1, Number(params.page) || 1);
   const wantsFit = params.sort !== "default"; // best fit is the default whenever there's a profile to fit
+  const filters = parseFilters(params);
+  const filtered = hasFilters(filters);
   await connection(); // in-process PGlite (demo) would otherwise query during prerendering
 
   const user = await getUser();
@@ -35,28 +62,48 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
   const canFit = Boolean(profile && (profile.skills.length || profile.resumeText));
   // Without the local model there's no profile vector; the list falls back to the plain order.
   const fitVector = canFit && wantsFit ? await profileVector(profile!).catch(() => null) : null;
-  const { rows, total, more, mode, fit } = await searchJobs(q, page, PAGE_SIZE, fitVector && { vector: fitVector, userId: user!.id });
+  const { rows, total, more, mode, fit } = await searchJobs(q, page, PAGE_SIZE, fitVector && { vector: fitVector, userId: user!.id }, filters);
   const ids = rows.map((r) => r.id);
   const [tracked, scores] = user ? await Promise.all([trackedJobIds(user.id, ids), matchScores(user.id, ids)]) : [null, null];
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const href = (p: number, byFit = wantsFit) =>
-    `/jobs?${new URLSearchParams({ ...(q && { q }), ...(!byFit && { sort: "default" }), page: String(p) })}`;
+    `/jobs?${new URLSearchParams({ ...(q && { q }), ...filterParams(filters), ...(!byFit && { sort: "default" }), page: String(p) })}`;
   const orderLink = (active: boolean) =>
     `rounded px-2.5 py-1 transition-[background-color,color] duration-150 ${active ? "bg-subtle font-medium text-foreground" : "text-muted hover:text-foreground"}`;
 
   return (
     <>
-      <form className="mt-6 flex gap-2" role="search">
-        <label htmlFor="q" className="sr-only">Search jobs</label>
-        <input
-          id="q"
-          name="q"
-          type="search"
-          defaultValue={q}
-          placeholder='e.g. frontend internship in India, or "next.js" -senior'
-          className={`${inputClass} h-10`}
-        />
-        <button className={buttonClass()}>Search</button>
+      <form className="mt-6" role="search">
+        <div className="flex gap-2">
+          <label htmlFor="q" className="sr-only">Search jobs</label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            defaultValue={q}
+            placeholder='e.g. frontend internship in India, or "next.js" -senior'
+            className={`${inputClass} h-10`}
+          />
+          <button className={buttonClass()}>Search</button>
+        </div>
+        {/* Plain GET fields: filters live in the URL, so results can be shared and work without JS. */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+          <FilterSelect name="level" label="Level" value={filters.level} any="Any level" options={Object.entries(LEVELS)} />
+          <FilterSelect name="country" label="Country" value={filters.country} any="Any country" options={COUNTRY_OPTIONS.map((c) => [c.code, c.label])} />
+          <FilterSelect name="company" label="Company" value={filters.company} any="Any company" options={sortedCompanies} />
+          <FilterSelect name="posted" label="Posted" value={filters.postedDays ? String(filters.postedDays) : null} any="Any time" options={Object.entries(POSTED)} />
+          <label className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs">
+            <input type="checkbox" name="remote" value="1" defaultChecked={filters.remote} className="accent-accent" />
+            Remote
+          </label>
+          {!wantsFit && <input type="hidden" name="sort" value="default" />}
+          <button className={buttonClass("secondary", "sm")}>Apply</button>
+          {filtered && (
+            <Link href={`/jobs?${new URLSearchParams({ ...(q && { q }), ...(!wantsFit && { sort: "default" }) })}`} className={`${linkClass} text-xs text-muted`}>
+              Clear filters
+            </Link>
+          )}
+        </div>
       </form>
       {DEMO && (
         <p className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
@@ -110,7 +157,11 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
         </ul>
       ) : (
         <p className="mt-6 rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted">
-          {q ? `No open jobs match “${q}”. Try fewer words or a broader role.` : "No open jobs yet. Run the ingest to pull them in."}
+          {filtered
+            ? "No open jobs match these filters. Try removing one."
+            : q
+              ? `No open jobs match “${q}”. Try fewer words or a broader role.`
+              : "No open jobs yet. Run the ingest to pull them in."}
         </p>
       )}
 

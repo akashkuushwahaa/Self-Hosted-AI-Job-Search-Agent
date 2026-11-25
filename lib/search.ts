@@ -1,7 +1,9 @@
-import { and, cosineDistance, desc, inArray, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
+import { and, cosineDistance, desc, eq, inArray, isNotNull, isNull, sql, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { jobs, matches } from "@/db/schema";
+import { DEMO } from "./demo";
 import { embed } from "./embed";
+import { countryPattern, levelPattern, NO_FILTERS, REMOTE_PATTERN, toPostgres, type Filters } from "./filters";
 import { relevant, MAX_DISTANCE } from "./relevance";
 import { rrf } from "./rrf";
 
@@ -11,6 +13,25 @@ const open = isNull(jobs.closedAt);
 const columns = { id: jobs.id, board: jobs.board, company: jobs.company, title: jobs.title, location: jobs.location, url: jobs.url, postedAt: jobs.postedAt };
 // Same expression as jobs_fts_idx, so Postgres can use the index.
 const doc = sql`to_tsvector('english', ${jobs.title} || ' ' || ${jobs.description})`;
+
+// The demo snapshot is frozen in time, so "past week" counts back from its newest posting, not today.
+const postedSince = DEMO ? sql`(select max(${jobs.postedAt}) from ${jobs})` : sql`now()`;
+
+// The filters as one condition (undefined when none are set), added to every search path.
+function filterWhere(f: Filters): SQL | undefined {
+  const country = f.country ? countryPattern(f.country) : null;
+  return and(
+    f.remote ? sql`${jobs.location} ~* ${toPostgres(REMOTE_PATTERN)}` : undefined,
+    country
+      ? country.codes
+        ? sql`(${jobs.location} ~* ${toPostgres(country.names)} or ${jobs.location} ~ ${toPostgres(country.codes)})`
+        : sql`${jobs.location} ~* ${toPostgres(country.names)}`
+      : undefined,
+    f.company ? eq(jobs.board, f.company) : undefined,
+    f.postedDays ? sql`${jobs.postedAt} >= ${postedSince} - make_interval(days => ${f.postedDays})` : undefined,
+    f.level ? sql`${jobs.title} ~* ${toPostgres(levelPattern(f.level))}` : undefined,
+  );
+}
 
 async function ids(where: SQL | undefined, ...orderBy: SQL[]) {
   const rows = await db.select({ id: jobs.id }).from(jobs).where(where).orderBy(...orderBy).limit(CANDIDATES);
@@ -35,9 +56,10 @@ function fitOrder(fit: Fit) {
 
 // `fit`: the user's profile vector and scores. With no query it orders every open job by fit;
 // with a query it joins keyword and semantic results as a third ranked list.
-export async function searchJobs(q: string, page: number, pageSize: number, fit?: Fit | null) {
+export async function searchJobs(q: string, page: number, pageSize: number, fit?: Fit | null, filters: Filters = NO_FILTERS) {
+  const live = and(open, filterWhere(filters));
   if (!q && fit) {
-    const where = and(open, isNotNull(jobs.embedding));
+    const where = and(live, isNotNull(jobs.embedding));
     const [rows, [{ total }]] = await Promise.all([
       db.select(columns).from(jobs).where(where).orderBy(...fitOrder(fit)).limit(pageSize).offset((page - 1) * pageSize),
       db.select({ total: sql<number>`count(*)::int` }).from(jobs).where(where),
@@ -46,14 +68,14 @@ export async function searchJobs(q: string, page: number, pageSize: number, fit?
   }
   if (!q) {
     const [rows, [{ total }]] = await Promise.all([
-      db.select(columns).from(jobs).where(open).orderBy(desc(jobs.postedAt)).limit(pageSize).offset((page - 1) * pageSize),
-      db.select({ total: sql<number>`count(*)::int` }).from(jobs).where(open),
+      db.select(columns).from(jobs).where(live).orderBy(desc(jobs.postedAt)).limit(pageSize).offset((page - 1) * pageSize),
+      db.select({ total: sql<number>`count(*)::int` }).from(jobs).where(live),
     ]);
     return { rows, total, more: false, mode: "recent" as SearchMode, fit: false };
   }
 
   const query = sql`websearch_to_tsquery('english', ${q})`;
-  const keyword = ids(and(open, sql`${doc} @@ ${query}`), desc(sql`ts_rank(${doc}, ${query})`));
+  const keyword = ids(and(live, sql`${doc} @@ ${query}`), desc(sql`ts_rank(${doc}, ${query})`));
   // Search still works without Ollama, just keyword-only.
   const semantic = embed([q], "search_query", 5_000).then(
     async ([v]) => {
@@ -61,7 +83,7 @@ export async function searchJobs(q: string, page: number, pageSize: number, fit?
       const hits = await db
         .select({ id: jobs.id, distance: sql<number>`${distance}` })
         .from(jobs)
-        .where(and(open, isNotNull(jobs.embedding), sql`${distance} < ${MAX_DISTANCE}`))
+        .where(and(live, isNotNull(jobs.embedding), sql`${distance} < ${MAX_DISTANCE}`))
         .orderBy(distance)
         .limit(CANDIDATES);
       return relevant(hits.map((h) => ({ id: h.id, distance: Number(h.distance) }))).map((h) => h.id);

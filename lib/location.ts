@@ -2,7 +2,7 @@
 // judged "must be authorized to work in the US" as merely "relocate" for a candidate in India.
 
 // Countries by code; short uppercase codes are matched case-sensitively so "us" in "join us" doesn't count.
-const COUNTRIES: Record<string, { names: string[]; codes?: string[] }> = {
+export const COUNTRIES: Record<string, { names: string[]; codes?: string[] }> = {
   US: { names: ["united states", "america"], codes: ["US", "USA", "U.S."] },
   IN: { names: ["india"] },
   GB: { names: ["united kingdom", "england"], codes: ["UK"] },
@@ -21,7 +21,7 @@ const COUNTRIES: Record<string, { names: string[]; codes?: string[] }> = {
 };
 
 // Cities and regions that appear in the boards and in profiles, mapped to their country.
-const CITIES: Record<string, string> = {
+export const CITIES: Record<string, string> = {
   "san francisco": "US", "new york": "US", nyc: "US", seattle: "US", austin: "US", boston: "US", chicago: "US",
   "los angeles": "US", denver: "US", miami: "US", "washington dc": "US", "bay area": "US", "palo alto": "US",
   bengaluru: "IN", bangalore: "IN", gurugram: "IN", gurgaon: "IN", ahmedabad: "IN", pune: "IN", hyderabad: "IN",
