@@ -11,7 +11,10 @@ import * as schema from "./schema";
 if (!DEMO && !process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set; copy .env.example to .env");
 
 // postgres.js connects on first query only. Demo mode never queries it: every LISTEN/NOTIFY path is off there.
-export const client = postgres(process.env.DATABASE_URL ?? "postgres://demo-mode-unused@localhost/none");
+// On globalThis, like the PGlite instance and pg-boss, so Next dev's hot reload reuses one pool
+// instead of opening a new one on every edit.
+const g = globalThis as unknown as { pgClient?: ReturnType<typeof postgres> };
+export const client = (g.pgClient ??= postgres(process.env.DATABASE_URL ?? "postgres://demo-mode-unused@localhost/none"));
 const postgresDb = drizzle({ client, schema, casing: "snake_case" });
 
 // Demo: Postgres compiled to WASM, loaded from the committed snapshot. One instance per process
