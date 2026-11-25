@@ -65,6 +65,15 @@ export const profileEmbeddings = pgTable("profile_embeddings", {
   embedding: vector({ dimensions: 768 }).notNull(),
 });
 
+// When the user last looked at /matches, for "N new since your last visit" after the daily run.
+// Its own table for the same reason as profile_embeddings: the demo snapshot predates it.
+export const matchesSeen = pgTable("matches_seen", {
+  userId: text()
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  seenAt: timestamp({ withTimezone: true }).notNull(),
+});
+
 // LLM fit scores. Deleted whenever the user's profile changes, so a score always reflects the current profile.
 export const matches = pgTable(
   "matches",

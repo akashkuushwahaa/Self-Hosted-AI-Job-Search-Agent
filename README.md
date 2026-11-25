@@ -19,8 +19,10 @@ npm run embed                 # embeds new/changed jobs; ~13 min for 7k on an M-
 ollama pull qwen2.5:7b        # local chat model for match scoring, ~4.7 GB
 npm run dev                   # http://localhost:3000
 npx playwright install chromium  # headless browser for company research, ~100 MB
-npm run worker                # second terminal: background scoring and research jobs
+npm run worker                # second terminal: scoring, research, and the daily refresh
 ```
+
+After the first ingest and embed, the worker keeps jobs fresh on its own: every day at 06:00 (local time; `REFRESH_CRON` in `.env`) it ingests every board, embeds new and changed jobs, and scores the new candidates for each user with a profile. A laptop asleep at 06:00 catches up with one run when it wakes.
 
 Set `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`). Email/password sign-in works out of the box; GitHub sign-in turns on when `GITHUB_CLIENT_ID`/`SECRET` are set.
 
@@ -57,7 +59,8 @@ claude mcp add shortlist -e SHORTLIST_USER_EMAIL=you@example.com -- npm run --si
 - Search (`lib/search.ts`) runs a keyword query (Postgres `websearch_to_tsquery` over a GIN index) and a semantic query (pgvector cosine distance over `nomic-embed-text` embeddings), then merges them with reciprocal rank fusion (`lib/rrf.ts`). Semantic hits past a measured distance cutoff are dropped (`lib/relevance.ts`), so a query nothing matches returns nothing instead of the 100 nearest jobs. "frontend internship in India" finds 0 jobs by keyword and relevant Bengaluru and remote roles with hybrid. If Ollama is down, search falls back to keyword-only and says so.
 - `/jobs` ranks by fit to your profile by default when you have one ("Best fit for you", with a toggle back to newest or most relevant). With no query it orders every open job by the best evidence available: jobs the model scored 40+ first, then unscored jobs by embedding closeness to your profile, then jobs already judged poor. With a query, that fit order joins keyword and semantic results as a third list in the same rank fusion.
 - `/jobs/[id]` shows the full posting (parsed into paragraphs and lists by `lib/text.ts`), your match score, reason and skill tags, the company brief summary, and Track and Apply. Job titles across the app open it.
-- Ingest clears a job's embedding only when its title or description changed, so `npm run embed` re-embeds just those.
+- Ingest clears a job's embedding only when the text it was built from (title, description, company, location) changed, so the embed step re-embeds just those.
+- The worker runs a daily refresh (`lib/refresh.ts`) on a pg-boss cron schedule: ingest (`lib/ingest.ts`), embed (`lib/embed-jobs.ts`), then one scoring job per user with a profile on the same per-user queue as the button, so it streams progress and never doubles up. The schedule uses pg-boss's `missed: "once"`, so a run missed while the machine slept happens once on wake. `/matches` then shows how many scores are new since your last visit, marked from the browser so a link prefetch doesn't count as a visit.
 - `/matches` ("For you") embeds the profile (cached in `profile_embeddings`, keyed by a hash of the model and the profile text, so it re-embeds only after an edit), takes the 30 nearest open jobs, and scores them (`lib/match.ts`). A local LLM (`qwen2.5:7b`) returns JSON through Ollama's structured output: a score, role fit, the posting's minimum years, a quote of its location rule, and matched and missing skills. Code then decides what the model gets wrong: seniority from the years; the location rule, accepted only if the posting really has a rule sentence naming that place (`lib/location.ts`); skill tags with perks and traits removed (`lib/skills.ts`); and caps on the score from all three. On the labeled eval this took AUC from 0.84 to 0.91 and stated location rules caught from 5/9 to 9/9, with no false positives ([evals/match](evals/match/README.md)). Scores are deleted when the profile changes.
 - Scoring runs off the request: "Score with AI" queues a [pg-boss](https://github.com/timgit/pg-boss) job on the same Postgres (`lib/queue.ts`), at most one queued or active per user. `npm run worker` (`scripts/worker.mts`) scores the unscored jobs one by one and sends a Postgres `NOTIFY` after each. `/api/progress` listens and forwards the user's own scoring progress (and research progress, which everyone watching a company sees) as server-sent events, and the page refreshes the list as each score lands. No polling, and no extra service.
 - `/company/[board]` researches a company on the same worker: headless Chromium (Playwright) reads its home page plus up to three same-site About, Engineering or Culture pages (`lib/research.ts`), and the local model writes a brief (`lib/dossier.ts`). Only sites from the curated list in `lib/companies.ts` are ever crawled, never a URL a user typed. Any page but the home page can fail without sinking the run. Product and tech names are kept only if the pages contain them: on PostHog's site the model listed 8 technologies, and none appeared on the pages it read. One brief per company, shared by all users and reused for a week; progress streams to everyone watching that company.
@@ -74,6 +77,7 @@ claude mcp add shortlist -e SHORTLIST_USER_EMAIL=you@example.com -- npm run --si
 - [x] Local LLM match scoring (Ollama) with code-enforced gates, and a labeled eval set
 - [ ] Bring-your-own-key providers (OpenAI / Anthropic) and recorded replies for demo mode
 - [x] Background scoring worker (pg-boss) with live progress over SSE (Postgres LISTEN/NOTIFY)
+- [x] Daily ingest → embed → score on a schedule, with "new since your last visit"
 - [x] Playwright company research as a worker job, with code-checked product and tech names
 - [x] Application tracker (drag and drop, optimistic updates)
 - [x] CI: lint, typecheck, tests, migrations, build

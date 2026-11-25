@@ -54,10 +54,11 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 ## 2. Missing features
 
 ### 2.1 Make it an agent: scheduled ingest, embed and score
-- [ ] **Where:** `scripts/worker.mts`, `lib/queue.ts`, `scripts/ingest.mts`, `scripts/embed.mts`, `lib/scoring.ts`
+- [x] **Where:** `scripts/worker.mts`, `lib/queue.ts`, `scripts/ingest.mts`, `scripts/embed.mts`, `lib/scoring.ts`
 - **Problem:** Ingest, embedding and scoring are all manual (`npm run ingest`, `npm run embed`, the "Score with AI" button). Jobs go stale unless someone runs them.
 - **Fix:** Move the ingest and embed logic into `lib/` functions the scripts and the worker both call. Use pg-boss `boss.schedule` for a daily ingest → embed → score of new candidates for each user with a profile. Then show "N new matches since your last visit" on `/matches` (needs a `lastSeenAt` per user or a `createdAt` comparison). An email digest over the user's own SMTP could come later, optionally.
 - **Done when:** with only `npm run dev` and `npm run worker` running, new jobs appear and get scored without manual commands.
+- **Done:** `lib/ingest.ts` (`ingestAll`, now also counts new jobs) and `lib/embed-jobs.ts` (`embedPending`), called by the scripts and by `lib/refresh.ts`. The worker schedules `refresh-jobs` with `boss.schedule` at `REFRESH_CRON` (default `0 6 * * *`, in the machine's time zone; `off` unschedules) and `missed: "once"`, so a laptop asleep at 06:00 runs once on wake. Scoring reuses the per-user `score-matches` queue (live progress, no double runs, only unscored top candidates). "N new since your last visit" uses a separate `matches_seen` table (migration 0008, same demo-snapshot reason as 3.3), written by a client component on mount so link prefetches don't count, and re-marked as scores land. Also added `heartbeatSeconds: 30` to all queues (`updateQueue`, so existing installs get it): a worker killed mid-job used to leave the job `active`, and under the `exclusive` policy blocking new runs, until expiry (up to 3 h for refresh); now the next worker start releases and retries it in about a minute. Verified: a manual refresh (33/33 boards, 126 new jobs, 436 embedded, scoring queued for 2 users), the cron firing on its own, a second ingest clearing 0 embeddings, the new-since-last-visit flow across three visits, a hard-killed refresh released and completed about 80 s after restart, and demo mode unchanged. Email digest not done.
 
 ### 2.2 Search filters
 - [ ] **Where:** `app/jobs/page.tsx`, `lib/search.ts`
@@ -124,7 +125,7 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 - [ ] Persist the last scoring and research run status. Today a failure is only an SSE event, lost on refresh. pg-boss's job table already has the state.
 - [ ] Wrap `getUser` in React `cache()` (`lib/session.ts:11`): `UserMenu` and each page look up the session separately on every request.
 - [ ] Keep the postgres.js client on `globalThis` like `lib/queue.ts` does (`db/index.ts:14`), so dev hot reload doesn't leak connection pools.
-- [ ] Ingest only clears the embedding when the title or description changes, but `jobDocument` (`lib/embed.ts:36-39`) also includes company and location. Include location in the comparison at `scripts/ingest.mts:29`.
+- [x] Ingest only clears the embedding when the title or description changes, but `jobDocument` (`lib/embed.ts:36-39`) also includes company and location. Include location in the comparison at `scripts/ingest.mts:29`. **Done in 2.1:** the comparison now covers title, description, company and location (`is not distinct from`, since location can be null); a back-to-back second ingest cleared 0 embeddings.
 
 ---
 

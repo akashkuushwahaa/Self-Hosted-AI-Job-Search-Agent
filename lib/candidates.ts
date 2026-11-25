@@ -51,6 +51,7 @@ export async function topCandidates(userId: string, profile: Profile) {
       description: jobs.description,
       similarity: sql<number>`1 - (${distance})`,
       score: matches.score,
+      scoredAt: matches.createdAt,
       reason: matches.reason,
       matchedSkills: matches.matchedSkills,
       missingSkills: matches.missingSkills,

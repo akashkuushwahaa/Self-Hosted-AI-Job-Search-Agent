@@ -1,11 +1,15 @@
+import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { Suspense } from "react";
+import { db } from "@/db";
+import { matchesSeen } from "@/db/schema";
 import { trackedJobIds } from "@/lib/applications";
 import { getProfile, topCandidates } from "@/lib/candidates";
 import { DEMO } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { TrackButton } from "../track-button";
 import { errorClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../ui";
+import { MarkSeen } from "./mark-seen";
 import { ScoreButton } from "./score-button";
 
 export default function MatchesPage() {
@@ -57,14 +61,24 @@ async function Matches() {
     );
   }
   const unscored = jobs.filter((j) => j.score == null).length;
-  const tracked = await trackedJobIds(user.id, jobs.map((j) => j.id));
+  const [tracked, [seen]] = await Promise.all([
+    trackedJobIds(user.id, jobs.map((j) => j.id)),
+    DEMO ? [] : db.select({ at: matchesSeen.seenAt }).from(matchesSeen).where(eq(matchesSeen.userId, user.id)),
+  ]);
+  // Scored since the last visit (the daily run, or scoring that finished after the user left).
+  // A first visit marks nothing new: every score would be.
+  const isNew = (j: { scoredAt: Date | null }) => Boolean(seen && j.scoredAt && j.scoredAt > seen.at);
+  const fresh = jobs.filter(isNew).length;
+  const latest = jobs.reduce((max, j) => (j.scoredAt && j.scoredAt.getTime() > max ? j.scoredAt.getTime() : max), 0);
 
   return (
     <>
       {header(unscored > 0 && !DEMO ? <ScoreButton unscored={unscored} /> : undefined)}
       <Muted className="mt-6 tabular-nums">
         {jobs.length} jobs{unscored ? `, ${unscored} not scored yet` : ", all scored"}
+        {fresh > 0 && <span className="text-accent">{` · ${fresh} new since your last visit`}</span>}
       </Muted>
+      {!DEMO && <MarkSeen latest={latest} />}
 
       <ul className="mt-2 divide-y divide-border border-y border-border">
         {jobs.map((j) => (
@@ -74,6 +88,7 @@ async function Matches() {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <Link href={`/jobs/${j.id}`} className="font-medium hover:underline">{j.title}</Link>
+                  {isNew(j) && <span className="ml-2 align-middle"><Tag tone="good">New</Tag></span>}
                   <p className="mt-0.5 text-sm text-muted">
                     <Link href={`/company/${j.board}`} className="text-foreground/80 hover:underline">{j.company}</Link>
                     {j.location && ` · ${j.location}`}
