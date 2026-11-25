@@ -37,3 +37,13 @@ jobs:
       - run: npm test
       - run: npm run db:migrate # every migration applies cleanly to an empty database
       - run: npm run build
+      # Demo mode is what recruiters see: build it, serve it, and load every public page in Chromium.
+      - run: npx playwright install --with-deps --only-shell chromium
+      - name: Smoke-test demo mode
+        env:
+          DEMO_MODE: "1"
+        run: |
+          npm run build
+          npm start -- -p 3100 &
+          timeout 60 bash -c 'until curl -sf -o /dev/null http://localhost:3100; do sleep 1; done'
+          npm run smoke -- http://localhost:3100

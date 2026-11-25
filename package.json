@@ -16,6 +16,7 @@
     "eval:match": "tsx --env-file=.env evals/match/run.mts",
     "worker": "tsx --env-file=.env scripts/worker.mts",
     "mcp": "tsx --env-file=.env scripts/mcp.mts",
+    "smoke": "tsx scripts/smoke.mts",
     "demo:seed": "tsx --env-file=.env scripts/demo-seed.mts",
     "demo:build": "tsx --env-file=.env scripts/build-demo.mts"
   },

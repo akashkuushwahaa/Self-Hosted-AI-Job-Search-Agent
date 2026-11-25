@@ -97,13 +97,15 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 ## 3. Engineering improvements
 
 ### 3.1 Integration tests on PGlite
-- [ ] **Where:** new `*.test.ts` alongside `lib/search.ts`, `scripts/ingest.mts` (after moving its logic to `lib/`), the server actions
+- [x] **Where:** new `*.test.ts` alongside `lib/search.ts`, `scripts/ingest.mts` (after moving its logic to `lib/`), the server actions
 - **Problem:** Unit tests cover the pure functions only. Search, the ingest logic that closes and reopens jobs, re-embed-on-change, and the auth/ownership checks in server actions have no tests.
 - **Fix:** PGlite is already a dependency: in vitest, start PGlite with the vector extension, run `migrate()` from `drizzle-orm/pglite/migrator` (as `scripts/build-demo.mts` does), and test against it. No Docker needed.
+- **Done:** `test/db.ts` boots PGlite with pgvector, runs `migrate()` on `db/migrations`, and each integration test file swaps it in with `vi.mock("@/db", () => import("@/test/db"))`, so `lib/` and `app/` code runs unchanged; only the network (board fetches), Ollama (`embed`) and request APIs (session, cookies) are mocked. 19 tests in 5 files: search (recent, filters, keyword fallback, semantic cutoff, fit order), ingest (new-job count, close/reopen keeping embeddings, re-embed only on embedded-text change, no closing on fetch failure, `embedPending`), the profile-embedding cache, tracker actions (ownership across users, undo, errors), and demo-mode tracker isolation across two visitors. Whole suite (101 tests) runs in ~2.5 s. Mutation-checked: reverting the re-embed comparison or the semantic cutoff makes them fail. Added `vitest.config.mts` (tsconfig paths).
 
 ### 3.2 Smoke-test demo mode in CI
-- [ ] **Where:** `.github/workflows/ci.yml`
+- [x] **Where:** `.github/workflows/ci.yml`
 - **Fix:** After `npm run build`, start the app with `DEMO_MODE=1` and use Playwright (already installed) to load `/`, `/jobs`, `/jobs?q=frontend internship in India`, `/matches`, `/tracker` and a company page with a brief, failing on console errors. This is the page recruiters see.
+- **Done:** `scripts/smoke.mts` (`npm run smoke -- <url>`, uses the existing `playwright` dependency): loads `/`, `/jobs`, a demo search (asserting it is still "keyword + semantic", i.e. the recorded embeddings match), a filtered list, `/matches`, `/tracker`, `/company/vercel` (brief), `/profile`, a missing job and a real job page from the list; fails on non-2xx, any console or page error, missing content, or a missing demo banner. CI installs the Chromium headless shell, builds with `DEMO_MODE=1`, serves on :3100 and runs it. Passed 3/3 locally; a deliberately broken base URL fails all 10 checks with exit 1. Not yet run on GitHub Actions itself.
 
 ### 3.3 Cache the profile embedding
 - [x] **Where:** `lib/candidates.ts:19`, `app/jobs/page.tsx:37`, `app/matches/page.tsx`, `app/profile/actions.ts`
