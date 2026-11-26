@@ -55,7 +55,7 @@ describe("searchJobs without a query", () => {
     await job("Software Engineer Intern", { location: "Dublin, Ireland" });
     await job("Senior Software Engineer");
     await job("Internal Tools Engineer");
-    const r = await searchJobs("", 1, 10, null, { ...NO_FILTERS, level: "intern", country: "IN" });
+    const r = await searchJobs("", 1, 10, { filters: { ...NO_FILTERS, level: "intern", country: "IN" } });
     expect(r.rows).toHaveLength(1);
     expect(r.rows[0]).toMatchObject({ title: "Software Engineer Intern", location: "Bengaluru, India" });
   });
@@ -100,7 +100,7 @@ describe("searchJobs ordered by fit", () => {
     const score = { reason: "", matchedSkills: [], missingSkills: [], model: "test", userId };
     await db.insert(matches).values([{ ...score, jobId: poor, score: 30 }, { ...score, jobId: good, score: 70 }]);
 
-    const r = await searchJobs("", 1, 10, { vector: axis(0), userId });
+    const r = await searchJobs("", 1, 10, { fit: { vector: axis(0), userId } });
     expect(r.mode).toBe("fit");
     expect(titles(r.rows)).toEqual(["Scored 70", "Unscored near", "Unscored far", "Scored 30"]);
   });

@@ -84,3 +84,6 @@ Thumbs.db
 !.vscode/extensions.json
 *.swp
 *~
+
+# ---------- Personal eval exports (contain a real profile and resume) ----------
+evals/match/*.local.json

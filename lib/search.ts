@@ -2,6 +2,7 @@ import { and, cosineDistance, desc, eq, inArray, isNotNull, isNull, sql, type SQ
 import { db } from "@/db";
 import { jobs, matches } from "@/db/schema";
 import { DEMO } from "./demo";
+import { notHiddenFor } from "./feedback";
 import { embed } from "./embed";
 import { countryPattern, levelPattern, NO_FILTERS, REMOTE_PATTERN, toPostgres, type Filters } from "./filters";
 import { relevant, MAX_DISTANCE } from "./relevance";
@@ -56,8 +57,11 @@ function fitOrder(fit: Fit) {
 
 // `fit`: the user's profile vector and scores. With no query it orders every open job by fit;
 // with a query it joins keyword and semantic results as a third ranked list.
-export async function searchJobs(q: string, page: number, pageSize: number, fit?: Fit | null, filters: Filters = NO_FILTERS) {
-  const live = and(open, filterWhere(filters));
+// `viewer`: the signed-in user, whose hidden ("Not interested") jobs are left out of every path.
+export type SearchOptions = { fit?: Fit | null; filters?: Filters; viewer?: string | null };
+
+export async function searchJobs(q: string, page: number, pageSize: number, { fit, filters = NO_FILTERS, viewer }: SearchOptions = {}) {
+  const live = and(open, filterWhere(filters), notHiddenFor(viewer ?? fit?.userId));
   if (!q && fit) {
     const where = and(live, isNotNull(jobs.embedding));
     const [rows, [{ total }]] = await Promise.all([

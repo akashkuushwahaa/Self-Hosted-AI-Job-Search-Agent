@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { db } from "@/db";
 import { jobs, matches, profileEmbeddings, profiles } from "@/db/schema";
 import { DEMO } from "./demo";
+import { notHiddenFor } from "./feedback";
 import { EMBED_MODEL, embed } from "./embed";
 import { profileQuery } from "./match";
 import { splitSkills } from "./skills";
@@ -58,7 +59,7 @@ export async function topCandidates(userId: string, profile: Profile) {
     })
     .from(jobs)
     .leftJoin(matches, and(eq(matches.jobId, jobs.id), eq(matches.userId, userId)))
-    .where(and(isNull(jobs.closedAt), isNotNull(jobs.embedding)))
+    .where(and(isNull(jobs.closedAt), isNotNull(jobs.embedding), notHiddenFor(userId)))
     .orderBy(distance)
     .limit(CANDIDATE_COUNT);
   // Scored jobs first by score; unscored keep their similarity order behind them.

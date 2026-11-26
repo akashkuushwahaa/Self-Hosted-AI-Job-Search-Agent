@@ -14,6 +14,7 @@
     "ingest": "tsx --env-file-if-exists=.env scripts/ingest.mts",
     "embed": "tsx --env-file-if-exists=.env scripts/embed.mts",
     "eval:match": "tsx --env-file-if-exists=.env evals/match/run.mts",
+    "eval:feedback": "tsx --env-file-if-exists=.env evals/match/export-feedback.mts",
     "worker": "tsx --env-file-if-exists=.env scripts/worker.mts",
     "mcp": "tsx --env-file-if-exists=.env scripts/mcp.mts",
     "smoke": "tsx scripts/smoke.mts",

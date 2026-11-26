@@ -6,10 +6,12 @@ import { db } from "@/db";
 import { matchesSeen } from "@/db/schema";
 import { trackedJobIds } from "@/lib/applications";
 import { getProfile, topCandidates } from "@/lib/candidates";
+import { ratingsFor } from "@/lib/feedback";
 import { DEMO } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { TrackButton } from "../track-button";
 import { errorClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../ui";
+import { HideableRow, RateScore } from "../feedback/controls";
 import { MarkSeen } from "./mark-seen";
 import { ScoreButton } from "./score-button";
 
@@ -64,9 +66,10 @@ async function Matches() {
     );
   }
   const unscored = jobs.filter((j) => j.score == null).length;
-  const [tracked, [seen]] = await Promise.all([
+  const [tracked, [seen], ratings] = await Promise.all([
     trackedJobIds(user.id, jobs.map((j) => j.id)),
     DEMO ? [] : db.select({ at: matchesSeen.seenAt }).from(matchesSeen).where(eq(matchesSeen.userId, user.id)),
+    ratingsFor(user.id, jobs.map((j) => j.id)),
   ]);
   // Scored since the last visit (the daily run, or scoring that finished after the user left).
   // A first visit marks nothing new: every score would be.
@@ -84,9 +87,14 @@ async function Matches() {
       {!DEMO && <MarkSeen latest={latest} />}
 
       <ul className="mt-2 divide-y divide-border border-y border-border">
-        {jobs.map((j) => (
-          <li key={j.id} className="flex gap-4 py-5">
-            <ScoreBadge score={j.score} />
+        {jobs.map((j) => {
+          const row = "flex gap-4 py-5";
+          const content = (
+          <>
+            <div className="flex w-12 shrink-0 flex-col items-center gap-1.5">
+              <ScoreBadge score={j.score} />
+              {!DEMO && j.score != null && <RateScore jobId={j.id} rating={ratings.get(j.id) ?? null} />}
+            </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -107,8 +115,14 @@ async function Matches() {
                 </p>
               ) : null}
             </div>
-          </li>
-        ))}
+          </>
+          );
+          return DEMO ? (
+            <li key={j.id} className={row}>{content}</li>
+          ) : (
+            <HideableRow key={j.id} jobId={j.id} title={j.title} className={row}>{content}</HideableRow>
+          );
+        })}
       </ul>
     </>
   );

@@ -10,6 +10,7 @@ import { DEMO, DEMO_QUERIES } from "@/lib/demo";
 import { COUNTRY_OPTIONS, filterParams, hasFilters, LEVELS, parseFilters, POSTED } from "@/lib/filters";
 import { searchJobs } from "@/lib/search";
 import { getUser } from "@/lib/session";
+import { HideableRow } from "../feedback/controls";
 import { TrackButton } from "../track-button";
 import { buttonClass, inputClass, linkClass, Muted, PageHeader, ScoreBadge } from "../ui";
 
@@ -65,7 +66,7 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
   const canFit = Boolean(profile && (profile.skills.length || profile.resumeText));
   // Without the local model there's no profile vector; the list falls back to the plain order.
   const fitVector = canFit && wantsFit ? await profileVector(profile!).catch(() => null) : null;
-  const { rows, total, more, mode, fit } = await searchJobs(q, page, PAGE_SIZE, fitVector && { vector: fitVector, userId: user!.id }, filters);
+  const { rows, total, more, mode, fit } = await searchJobs(q, page, PAGE_SIZE, { fit: fitVector && { vector: fitVector, userId: user!.id }, filters, viewer: user?.id });
   const ids = rows.map((r) => r.id);
   const [tracked, scores] = user ? await Promise.all([trackedJobIds(user.id, ids), matchScores(user.id, ids)]) : [null, null];
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -141,8 +142,10 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
 
       {rows.length ? (
         <ul className="mt-2 divide-y divide-border border-y border-border">
-          {rows.map((j) => (
-            <li key={j.id} className="flex items-center gap-4 py-3.5">
+          {rows.map((j) => {
+            const row = "flex items-center gap-4 py-3.5";
+            const content = (
+            <>
               {scores?.has(j.id) && <ScoreBadge score={scores.get(j.id)!} />}
               <div className="min-w-0 flex-1">
                 <Link href={`/jobs/${j.id}`} className="font-medium hover:underline">
@@ -155,8 +158,15 @@ async function Results({ searchParams }: Pick<PageProps<"/jobs">, "searchParams"
                 </p>
               </div>
               {tracked && <TrackButton jobId={j.id} tracked={tracked.has(j.id)} />}
-            </li>
-          ))}
+            </>
+            );
+            // Signed-in users can hide a job; signed-out visitors and the demo get a plain row.
+            return user && !DEMO ? (
+              <HideableRow key={j.id} jobId={j.id} title={j.title} className={row}>{content}</HideableRow>
+            ) : (
+              <li key={j.id} className={row}>{content}</li>
+            );
+          })}
         </ul>
       ) : (
         <p className="mt-6 rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted">

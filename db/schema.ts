@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { date, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid, vector } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, jsonb, pgTable, smallint, primaryKey, text, timestamp, uniqueIndex, uuid, vector } from "drizzle-orm/pg-core";
 import type { Dossier } from "../lib/dossier";
 import { STATUSES } from "../lib/tracker";
 import { user } from "./auth-schema";
@@ -81,6 +81,29 @@ export const applicationDetails = pgTable(
     nextStep: text(),
     followUpOn: date(),
     notes: text(),
+    updatedAt: timestamp({ withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.jobId] })],
+);
+
+// The user's own judgment of a job: "Not interested" hides it from /jobs and /matches, and a
+// thumbs up/down rates the model's score. `ratedScore` keeps the score as it was when rated, since
+// scores are deleted when the profile changes; rated pairs export as eval labels (npm run eval:feedback).
+export const jobFeedback = pgTable(
+  "job_feedback",
+  {
+    userId: text()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    jobId: uuid()
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    hidden: boolean().notNull().default(false),
+    rating: smallint(), // 1 up, -1 down, null unrated
+    ratedScore: integer(),
     updatedAt: timestamp({ withTimezone: true })
       .notNull()
       .defaultNow()

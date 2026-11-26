@@ -53,7 +53,7 @@ server.registerTool(
   },
   async ({ query, limit, level, country, remote, company, postedWithinDays }) => {
     const filters = { remote: remote ?? false, country: country ?? null, company: company ?? null, postedDays: postedWithinDays ?? null, level: level ?? null };
-    const { rows, total, more, mode } = await searchJobs(query.trim(), 1, limit, null, filters);
+    const { rows, total, more, mode } = await searchJobs(query.trim(), 1, limit, { filters, viewer: await currentUserId() });
     return json({ mode, total, moreMayMatch: more, filters: filterParams(filters), jobs: rows });
   },
 );

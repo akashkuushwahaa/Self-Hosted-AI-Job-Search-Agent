@@ -10,10 +10,12 @@ import { companyResearch, jobs, matches } from "@/db/schema";
 import { trackedJobIds } from "@/lib/applications";
 import { getProfile } from "@/lib/candidates";
 import { DEMO } from "@/lib/demo";
+import { ratingsFor } from "@/lib/feedback";
 import { splitSkills } from "@/lib/skills";
 import { getUser } from "@/lib/session";
 import { cleanReason, toBlocks } from "@/lib/text";
 import { TrackButton } from "../../track-button";
+import { RateScore } from "../../feedback/controls";
 import { ScoreJobButton } from "./score-job-button";
 import { buttonClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../../ui";
 
@@ -58,6 +60,7 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
     db.select({ summary: companyResearch.dossier }).from(companyResearch).where(eq(companyResearch.board, job.board)),
     user ? getProfile(user.id) : null,
   ]);
+  const rating = user && match ? ((await ratingsFor(user.id, [id])).get(id) ?? null) : null;
   const skills = match && splitSkills(match.matchedSkills, match.missingSkills, profile ?? { skills: [], resumeText: null });
 
   return (
@@ -85,7 +88,10 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
       {match && skills && (
         <Section title="Your match">
           <div className="flex gap-4">
-            <ScoreBadge score={match.score} />
+            <div className="flex shrink-0 flex-col items-center gap-1.5">
+              <ScoreBadge score={match.score} />
+              {!DEMO && <RateScore jobId={job.id} rating={rating} />}
+            </div>
             <div className="min-w-0">
               <p className="text-sm">{cleanReason(match.reason)}</p>
               {(skills.matched.length > 0 || skills.missing.length > 0) && (
