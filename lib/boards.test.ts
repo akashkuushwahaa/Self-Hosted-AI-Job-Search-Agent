@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { htmlToText, parsers } from "./boards";
 
 describe("htmlToText", () => {
+  it("decodes the typographic entities postings use", () => {
+    expect(htmlToText("<p>$164,200&mdash;$229,900 &ndash; it&rsquo;s &ldquo;great&rdquo;&hellip;</p>")).toBe("$164,200—$229,900 – it’s “great”…");
+  });
+
   it("strips tags, keeps list structure, decodes entities", () => {
     expect(htmlToText("<p>Hi &amp; welcome</p><ul><li>Go</li><li>Rust&#39;s</li></ul>")).toBe(
       "Hi & welcome\n\n• Go\n• Rust's",

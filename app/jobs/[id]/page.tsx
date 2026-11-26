@@ -6,7 +6,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { z } from "zod";
 import { db } from "@/db";
-import { companyResearch, jobs, matches } from "@/db/schema";
+import { companyResearch, jobs, matches, tailoredApplications } from "@/db/schema";
 import { trackedJobIds } from "@/lib/applications";
 import { getProfile } from "@/lib/candidates";
 import { DEMO } from "@/lib/demo";
@@ -17,6 +17,7 @@ import { cleanReason, toBlocks } from "@/lib/text";
 import { TrackButton } from "../../track-button";
 import { RateScore } from "../../feedback/controls";
 import { ScoreJobButton } from "./score-job-button";
+import { TailorButton, TailoredView } from "./tailor";
 import { buttonClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../../ui";
 
 export async function generateMetadata({ params }: PageProps<"/jobs/[id]">): Promise<Metadata> {
@@ -60,6 +61,9 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
     db.select({ summary: companyResearch.dossier }).from(companyResearch).where(eq(companyResearch.board, job.board)),
     user ? getProfile(user.id) : null,
   ]);
+  const [tailored] = user && !DEMO
+    ? await db.select().from(tailoredApplications).where(and(eq(tailoredApplications.userId, user.id), eq(tailoredApplications.jobId, id)))
+    : [];
   const rating = user && match ? ((await ratingsFor(user.id, [id])).get(id) ?? null) : null;
   const skills = match && splitSkills(match.matchedSkills, match.missingSkills, profile ?? { skills: [], resumeText: null });
 
@@ -108,6 +112,27 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
         <Section title="Your match">
           <Muted>Not scored for you yet. <Link href="/matches" className={linkClass}>For you</Link> scores the jobs closest to your profile; you can score this one now.</Muted>
           {!DEMO && <div className="mt-3"><ScoreJobButton jobId={job.id} /></div>}
+        </Section>
+      )}
+
+      {user && !DEMO && (
+        <Section title="Tailor your application">
+          {tailored ? (
+            <>
+              <TailoredView t={tailored.content} />
+              <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-4 text-xs text-muted">
+                <span>Written by {tailored.model} from your resume on {tailored.createdAt.toLocaleDateString("en-IN", { dateStyle: "medium" })}. Check it before you send it.</span>
+                <TailorButton jobId={job.id} again />
+              </div>
+            </>
+          ) : profile?.resumeText ? (
+            <>
+              <Muted className="mb-3">Uses only what your resume says: anything it doesn&apos;t back is removed, and listed.</Muted>
+              <TailorButton jobId={job.id} again={false} />
+            </>
+          ) : (
+            <Muted><Link href="/profile" className={linkClass}>Upload a resume</Link> to get a summary, resume points and a cover letter written for this job.</Muted>
+          )}
         </Section>
       )}
 

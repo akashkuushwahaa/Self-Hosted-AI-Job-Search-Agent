@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { boolean, date, index, integer, jsonb, pgTable, smallint, primaryKey, text, timestamp, uniqueIndex, uuid, vector } from "drizzle-orm/pg-core";
 import type { Dossier } from "../lib/dossier";
+import type { Tailored } from "../lib/tailor";
 import { SOURCES } from "../lib/boards";
 import { STATUSES } from "../lib/tracker";
 import { user } from "./auth-schema";
@@ -109,6 +110,24 @@ export const jobFeedback = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.jobId] })],
+);
+
+// A summary, resume points and cover letter written for one job from the user's resume
+// (lib/tailor.ts). One per user and job; writing it again replaces it.
+export const tailoredApplications = pgTable(
+  "tailored_applications",
+  {
+    userId: text()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    jobId: uuid()
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    content: jsonb().$type<Tailored>().notNull(),
+    model: text().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.jobId] })],
 );

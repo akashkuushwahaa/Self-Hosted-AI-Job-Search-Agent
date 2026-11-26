@@ -16,7 +16,12 @@ export type BoardJob = {
   postedAt: Date | null;
 };
 
-const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+// Named entities seen in postings (numeric ones are decoded generically below).
+const ENTITIES: Record<string, string> = {
+  amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ",
+  mdash: "—", ndash: "–", hellip: "…", lsquo: "‘", rsquo: "’", ldquo: "“", rdquo: "”",
+  middot: "·", bull: "•", trade: "™", reg: "®", copy: "©", euro: "€", pound: "£", times: "×",
+};
 
 export function decodeEntities(s: string): string {
   return s.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (m, e: string) => {

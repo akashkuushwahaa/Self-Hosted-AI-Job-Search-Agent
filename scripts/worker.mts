@@ -3,7 +3,8 @@ import { count } from "drizzle-orm";
 import { db } from "../db";
 import { jobs } from "../db/schema";
 import { fillProfileFromResume } from "../lib/profile";
-import { getBoss, PROFILE_QUEUE, REFRESH_QUEUE, RESEARCH_QUEUE, SCORE_QUEUE, type ProfileJob, type ResearchJob, type ScoreJob } from "../lib/queue";
+import { tailorApplication } from "../lib/tailor";
+import { getBoss, PROFILE_QUEUE, REFRESH_QUEUE, RESEARCH_QUEUE, SCORE_QUEUE, type ProfileJob, type ResearchJob, type ScoreJob, TAILOR_QUEUE, type TailorJob } from "../lib/queue";
 import { refreshJobs } from "../lib/refresh";
 import { researchCompany } from "../lib/research-run";
 import { scoreOne, scoreUnscored } from "../lib/scoring";
@@ -29,6 +30,11 @@ await boss.work<ProfileJob>(PROFILE_QUEUE, async ([job]) => {
   const filled = await fillProfileFromResume(job.data.userId);
   console.log(`filled ${filled.length ? filled.join(", ") : "nothing new"} for ${job.data.userId}`);
 });
+await boss.work<TailorJob>(TAILOR_QUEUE, async ([job]) => {
+  console.log(`tailoring job ${job.data.jobId} for ${job.data.userId}`);
+  const t = await tailorApplication(job.data.userId, job.data.jobId);
+  console.log(`tailored: ${t.highlights.length} points kept, ${t.removed.length} unsupported claims removed`);
+});
 await boss.work(REFRESH_QUEUE, async () => {
   console.log("refreshing jobs");
   const r = await refreshJobs((line) => console.log(`  ${line}`));
@@ -48,7 +54,7 @@ if (REFRESH_CRON === "off") {
 // waiting for tomorrow's run. The queue's exclusive policy keeps this to one refresh at a time.
 const [{ total }] = await db.select({ total: count() }).from(jobs);
 if (total === 0) console.log(`no jobs yet: first refresh queued (${await boss.send(REFRESH_QUEUE, {})})`);
-console.log(`worker listening on ${SCORE_QUEUE}, ${RESEARCH_QUEUE}, ${REFRESH_QUEUE}, ${PROFILE_QUEUE}`);
+console.log(`worker listening on ${SCORE_QUEUE}, ${RESEARCH_QUEUE}, ${REFRESH_QUEUE}, ${PROFILE_QUEUE}, ${TAILOR_QUEUE}`);
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, async () => {
