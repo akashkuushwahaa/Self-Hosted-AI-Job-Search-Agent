@@ -36,6 +36,7 @@ const checks: Check[] = [
     expect: async (page) => ((await page.locator("#skills").count()) && (await page.locator("#skills").inputValue()) ? null : "the demo profile has no skills"),
   },
   { path: "/jobs/00000000-0000-4000-8000-000000000000", expect: text("Not found") },
+  { path: "/forgot-password", expect: text(/isn't set up on this server/) },
 ];
 
 const browser = await chromium.launch();

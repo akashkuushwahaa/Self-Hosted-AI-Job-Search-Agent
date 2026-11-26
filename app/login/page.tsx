@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { githubEnabled, signup } from "@/lib/auth";
+import { githubEnabled, mailEnabled, signup } from "@/lib/auth";
 import { DEMO } from "@/lib/demo";
 import { linkClass, PageHeader } from "../ui";
 import { LoginForm } from "./login-form";
@@ -16,7 +16,7 @@ export default function LoginPage() {
           The demo signs everyone in as a fictional candidate. Go to <Link href="/matches" className={linkClass}>For you</Link>.
         </p>
       ) : (
-        <LoginForm githubEnabled={githubEnabled} signup={signup.mode} />
+        <LoginForm githubEnabled={githubEnabled} signup={signup.mode} canReset={mailEnabled} />
       )}
     </main>
   );

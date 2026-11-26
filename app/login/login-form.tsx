@@ -1,13 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { buttonClass, errorClass, inputClass as input, labelClass } from "../ui";
+import { buttonClass, errorClass, inputClass as input, labelClass, linkClass } from "../ui";
 
 const button = `${buttonClass()} w-full`;
 
-export function LoginForm({ githubEnabled, signup }: { githubEnabled: boolean; signup: "open" | "closed" | "invite" }) {
+export function LoginForm({ githubEnabled, signup, canReset }: { githubEnabled: boolean; signup: "open" | "closed" | "invite"; canReset: boolean }) {
   const router = useRouter();
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +57,10 @@ export function LoginForm({ githubEnabled, signup }: { githubEnabled: boolean; s
           <input id="email" name="email" type="email" required autoComplete="email" className={input} />
         </div>
         <div>
-          <label htmlFor="password" className={labelClass}>Password</label>
+          <div className="flex items-baseline justify-between">
+            <label htmlFor="password" className={labelClass}>Password</label>
+            {canReset && mode === "signIn" && <Link href="/forgot-password" className={`${linkClass} text-xs text-muted`}>Forgot password?</Link>}
+          </div>
           <input
             id="password"
             name="password"
