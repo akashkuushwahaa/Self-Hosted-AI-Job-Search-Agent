@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
 import { DEMO } from "@/lib/demo";
+import { siteUrl } from "@/lib/site-url";
 import { Nav, NavLinks } from "./nav";
 import { linkClass, REPO_URL } from "./ui";
 import { UserMenu } from "./user-menu";
@@ -19,9 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  // Absolute URLs for the link-preview image. Self-hosted: the public URL auth already needs.
-  // Unset (the Vercel demo): Next uses the Vercel deployment URL.
-  metadataBase: process.env.BETTER_AUTH_URL ? new URL(process.env.BETTER_AUTH_URL) : undefined,
+  // Absolute URLs for the link-preview image (lib/site-url.ts: BETTER_AUTH_URL, else Vercel's domain).
+  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: { default: "Shortlist · self-hosted AI job search", template: "%s · Shortlist" },
   description: "Self-hosted AI job search: hybrid search over public career boards, local-LLM match scoring, company research and an application tracker. No paid APIs.",
 };

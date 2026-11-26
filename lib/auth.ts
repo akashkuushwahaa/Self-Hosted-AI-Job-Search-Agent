@@ -6,6 +6,7 @@ import { db } from "@/db";
 import * as schema from "@/db/auth-schema";
 import { mailEnabled, sendMail } from "./mail";
 import { mayCreateAccount, signupPolicy } from "./signup";
+import { siteUrl } from "./site-url";
 
 const github =
   process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
@@ -17,6 +18,7 @@ export const signup = signupPolicy();
 export { mailEnabled };
 
 export const auth = betterAuth({
+  baseURL: siteUrl,
   database: drizzleAdapter(db, { provider: "pg", schema }),
   emailAndPassword: {
     enabled: true,
