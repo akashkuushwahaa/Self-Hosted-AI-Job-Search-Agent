@@ -4,7 +4,7 @@
 
 Self-hosted AI job search. No paid APIs, no free-tier keys that expire.
 
-Jobs come straight from companies' public career boards (Greenhouse, Lever, Ashby), which need no API key, into Postgres with full-text search.
+Jobs come straight from companies' public career boards (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Recruitee), which need no API key, into Postgres with full-text search.
 
 ## Run it
 
@@ -25,9 +25,9 @@ cp .env.example .env
 docker compose up -d --wait db   # Postgres 16 + pgvector only
 npm install
 npm run db:migrate
-npm run ingest                # ~7k jobs from 33 companies, about a minute
+npm run ingest                # ~8k jobs from 45 companies, under a minute
 ollama pull nomic-embed-text  # local embedding model, ~270 MB
-npm run embed                 # embeds new/changed jobs; ~13 min for 7k on an M-series Mac
+npm run embed                 # embeds new/changed jobs; ~10–15 min for 8k on an M-series Mac
 ollama pull qwen2.5:7b        # local chat model for match scoring, ~4.7 GB
 npm run dev                   # http://localhost:3000
 npx playwright install chromium  # headless browser for company research, ~100 MB
@@ -38,7 +38,7 @@ After the first ingest and embed, the worker keeps jobs fresh on its own: every 
 
 Set `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`). Email/password sign-in works out of the box; GitHub sign-in turns on when `GITHUB_CLIENT_ID`/`SECRET` are set.
 
-`npm test` runs the unit tests; `npm run eval:match` runs the match-scoring eval (see [evals/match](evals/match/README.md)). Add a company in `lib/companies.ts`.
+`npm test` runs the unit tests; `npm run eval:match` runs the match-scoring eval (see [evals/match](evals/match/README.md)). Add a company with one entry in `config/companies.json` (its board and its own site); it's validated at startup.
 
 ## Demo mode (free hosting that doesn't expire)
 
@@ -64,7 +64,7 @@ claude mcp add shortlist -e SHORTLIST_USER_EMAIL=you@example.com -- npm run --si
 
 ## How it works
 
-- `lib/boards.ts` fetches each board, validates the response with Zod, and normalizes it to one job shape.
+- `lib/boards.ts` fetches each board, validates the response with Zod, and normalizes it to one job shape. SmartRecruiters lists postings without descriptions, so its fetcher pages through the list and reads each posting's detail, five at a time. The company list is `config/companies.json`, validated by `lib/companies.ts`.
 - `scripts/ingest.mts` upserts jobs, and marks ones a board no longer lists as closed instead of deleting them. A board that fails is skipped, so an outage never closes its jobs.
 - Auth is [Better Auth](https://better-auth.com) on the same Postgres (`db/auth-schema.ts`); `lib/session.ts` guards pages and server actions. Sign-up is open by default for a local install; on a public server set `ALLOW_SIGNUP=0` or `ALLOWED_EMAILS` (`lib/signup.ts`), enforced on user creation so it covers GitHub sign-in too. "Delete your account" on `/profile` removes the user row, and every table holding that user's data cascades from it. Password reset works when `SMTP_URL` points at any SMTP server (`lib/mail.ts`, nodemailer), or `SMTP_URL=log` prints the link to the server console; reset links last an hour, work once, and sign out other devices. Without it, "Forgot password?" is hidden.
 - `/profile` saves profile fields with Zod-validated server actions; resume upload checks size and the PDF signature, then stores only the extracted text (`lib/resume.ts`). Upload can also fill in the profile: the local model extracts headline, location, years, skills and suitable roles (`lib/resume-profile.ts`), and code fills only empty fields, adds only skills the resume text actually contains, and never overwrites what you typed.
@@ -85,7 +85,7 @@ claude mcp add shortlist -e SHORTLIST_USER_EMAIL=you@example.com -- npm run --si
 ## Roadmap
 
 - [x] Postgres + Drizzle migrations, Docker Compose
-- [x] Greenhouse / Lever / Ashby ingest, full-text search
+- [x] Greenhouse / Lever / Ashby / SmartRecruiters / Workable / Recruitee ingest, full-text search
 - [x] Auth (Better Auth: email/password + optional GitHub), profile, resume upload
 - [x] Resume fills in the profile; jobs ranked by fit to your resume; job detail page
 - [x] Local embeddings (Ollama) + pgvector hybrid search

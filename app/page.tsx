@@ -9,7 +9,7 @@ import { MATCH_AUC } from "@/lib/eval-summary";
 import { buttonClass, REPO_URL, Tag } from "./ui";
 
 const steps = [
-  ["Ingest", "Greenhouse, Lever and Ashby boards into Postgres, no API keys."],
+  ["Ingest", "Greenhouse, Lever, Ashby, SmartRecruiters, Workable and Recruitee boards into Postgres, no API keys."],
   ["Search", "Keyword and pgvector semantic search, merged with reciprocal rank fusion."],
   ["Score", "qwen2.5 via Ollama, with code-checked seniority, location and skill gates."],
   ["Research", "Playwright reads the company's site; the model writes a brief with checked facts."],

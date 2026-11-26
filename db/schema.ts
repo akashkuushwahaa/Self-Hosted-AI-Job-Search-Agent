@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { boolean, date, index, integer, jsonb, pgTable, smallint, primaryKey, text, timestamp, uniqueIndex, uuid, vector } from "drizzle-orm/pg-core";
 import type { Dossier } from "../lib/dossier";
+import { SOURCES } from "../lib/boards";
 import { STATUSES } from "../lib/tracker";
 import { user } from "./auth-schema";
 
@@ -11,7 +12,7 @@ export const jobs = pgTable(
   "jobs",
   {
     id: uuid().primaryKey().defaultRandom(),
-    source: text({ enum: ["greenhouse", "lever", "ashby"] }).notNull(),
+    source: text({ enum: SOURCES }).notNull(),
     board: text().notNull(),
     externalId: text().notNull(),
     company: text().notNull(),

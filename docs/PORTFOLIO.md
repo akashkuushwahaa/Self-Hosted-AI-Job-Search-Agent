@@ -14,12 +14,12 @@ Everything needed to put this project on a resume, a portfolio site, LinkedIn or
 | | |
 |---|---|
 | **Name** | Shortlist: Self-Hosted AI Job Search Agent |
-| **One line** | A self-hosted job search app that pulls ~7,200 live jobs from 33 companies' career boards, ranks them with hybrid search, scores fit with a local LLM whose mistakes are corrected in code, researches companies with a headless browser, and tracks applications. No paid APIs. |
+| **One line** | A self-hosted job search app that pulls ~8,300 live jobs from 45 companies' career boards, ranks them with hybrid search, scores fit with a local LLM whose mistakes are corrected in code, researches companies with a headless browser, and tracks applications. No paid APIs. |
 | **Repo** | https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent |
 | **Live demo** | `<DEMO_URL>` (runs entirely on a PGlite snapshot; no server, model or key needed) |
 | **Role** | Solo: design, backend, frontend, ML evaluation, infra |
 | **When** | November 2026 |
-| **Size** | ~6,000 lines of TypeScript; 20+ commits; 10 database migrations; 122 tests (24 files) |
+| **Size** | ~6,000 lines of TypeScript; 20+ commits; 10 database migrations; 126 tests (24 files) |
 | **Cost to run** | $0: local models (Ollama), Postgres, free Vercel plan for the demo |
 
 **Stack:** TypeScript, Next.js 16 (App Router, Cache Components, server actions), React 19, Tailwind CSS 4, PostgreSQL 16 + pgvector, Drizzle ORM, PGlite (Postgres in WASM), Ollama (`qwen2.5:7b`, `nomic-embed-text`), pg-boss (job queue on Postgres), Playwright, Better Auth, Zod, Model Context Protocol (MCP) SDK, Vitest, Docker Compose, GitHub Actions.
@@ -29,7 +29,7 @@ Everything needed to put this project on a resume, a portfolio site, LinkedIn or
 ## 2. Taglines
 
 - **Short (≤ 100 chars):** Self-hosted AI job search: hybrid search, local-LLM fit scores checked by code, $0 to run.
-- **Medium:** An AI job search agent that runs on your own machine: it ingests 7k+ live postings daily, ranks them by hybrid keyword + vector search, and scores fit with a local 7B model whose seniority and location judgments are enforced in code, lifting ranking AUC from 0.71 to 0.91†.
+- **Medium:** An AI job search agent that runs on your own machine: it ingests 8k+ live postings daily, ranks them by hybrid keyword + vector search, and scores fit with a local 7B model whose seniority and location judgments are enforced in code, lifting ranking AUC from 0.71 to 0.91†.
 - **Why it exists:** I replaced my earlier job-search project because it depended on free tiers and API credits that expired. This one has no dependency that can stop working: public career boards, local models, Postgres.
 
 ---
@@ -41,7 +41,7 @@ Pick the version that fits the role. Keep 3–4 bullets.
 ### AI / ML engineer version
 
 **Shortlist: Self-Hosted AI Job Search Agent** · TypeScript, Next.js, PostgreSQL/pgvector, Ollama, Playwright · [GitHub](https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent) · [Demo](<DEMO_URL>)
-- Built a job-matching pipeline over ~7,200 live postings from 33 companies: hybrid search (Postgres full-text + pgvector embeddings fused with reciprocal rank fusion) and a local 7B LLM that scores candidate fit through structured JSON output.
+- Built a job-matching pipeline over ~8,300 live postings from 45 companies: hybrid search (Postgres full-text + pgvector embeddings fused with reciprocal rank fusion) and a local 7B LLM that scores candidate fit through structured JSON output.
 - Raised ranking AUC from 0.71 (embedding similarity) to 0.91† on a 48-pair labeled eval by letting the model extract facts (required years, the posting's location rule) and deciding seniority and location in code; caught 9/9 stated location rules with no false positives, up from 5/9.
 - Cut hallucinated output: company briefs keep a product or technology only if the crawled pages contain it (the model listed 8 technologies for one company, none of which appeared on its pages); a measured cosine-distance cutoff stops nonsense queries returning 100 "matches".
 - Ran 7 eval iterations, keeping a results file per version and shipping only changes that improved the numbers.
@@ -52,19 +52,19 @@ Pick the version that fits the role. Keep 3–4 bullets.
 - Built a full-stack job search app (search with filters, AI match scores, company research, drag-and-drop application tracker with optimistic updates, auth with sign-up controls, password reset and account deletion) on Next.js 16 server components and server actions.
 - Streamed background-job progress to the browser with Postgres LISTEN/NOTIFY and server-sent events: no polling and no extra message broker.
 - Shipped a zero-cost public demo: the whole app runs on a Postgres-in-WASM (PGlite) snapshot with recorded model output on Vercel's free plan, with per-visitor tracker state kept in a cookie so visitors never see each other's changes.
-- Covered the app with 122 tests, including integration tests against real Postgres + pgvector in-process (no Docker), and a CI smoke test that loads every public page in headless Chromium.
+- Covered the app with 126 tests, including integration tests against real Postgres + pgvector in-process (no Docker), and a CI smoke test that loads every public page in headless Chromium.
 
 ### Backend / infrastructure version
 
 **Shortlist: Self-Hosted AI Job Search Agent** · Node.js, PostgreSQL/pgvector, pg-boss, Docker, GitHub Actions · [GitHub](https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent)
 - Built a scheduled ingest → embed → score agent on pg-boss (a Postgres-backed queue): daily cron with catch-up after the host sleeps, per-user exclusive queues, and heartbeats that recover a crashed worker's job in ~80 s instead of blocking for up to 3 h.
-- Ingested ~7,200 jobs from Greenhouse, Lever and Ashby with Zod-validated parsers; jobs a board drops are closed rather than deleted, a failed fetch never closes anything, and embeddings are recomputed only when the embedded text changes.
+- Ingested ~8,300 jobs from 6 public board APIs (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Recruitee) with Zod-validated parsers; jobs a board drops are closed rather than deleted, a failed fetch never closes anything, and embeddings are recomputed only when the embedded text changes.
 - Packaged the app, worker (with Chromium), migrations and Postgres as one `docker compose up`; a fresh install fetches and embeds all jobs with no manual step (8.5 min for 7,224 jobs).
 - Cut a per-page-load model call from ~85 ms to ~1–2 ms by caching the profile embedding under a hash of the model and input text, so it invalidates itself on any change.
 
 ### One-line version (for a crowded resume)
 
-**Shortlist** – self-hosted AI job search (Next.js, Postgres/pgvector, local LLM): hybrid search over 7k live jobs, LLM fit scores with code-enforced checks (AUC 0.71 → 0.91†), background agent on a Postgres queue, $0 to run.
+**Shortlist** – self-hosted AI job search (Next.js, Postgres/pgvector, local LLM): hybrid search over 8k live jobs, LLM fit scores with code-enforced checks (AUC 0.71 → 0.91†), background agent on a Postgres queue, $0 to run.
 
 ---
 
@@ -76,7 +76,7 @@ Job boards rank by recency or paid placement, not by fit, and AI job tools usual
 
 ### What it does
 
-- **Live jobs, no API keys.** Pulls ~7,200 open roles daily from the public career boards (Greenhouse, Lever, Ashby) of 33 companies, including Stripe, OpenAI, Anthropic, Databricks, Cloudflare, Razorpay, Groww, CRED and Meesho.
+- **Live jobs, no API keys.** Pulls ~8,300 open roles daily from the public career boards (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Recruitee) of 45 companies, including Stripe, OpenAI, Anthropic, Perplexity, Databricks, Cloudflare, Razorpay, Paytm, Freshworks, Groww, CRED and Meesho. Adding a company is one line in a config file.
 - **Search that understands intent.** "frontend internship in India" finds 0 jobs by keyword alone; hybrid search returns relevant Bengaluru and remote roles. Filters for level, country, remote, company and posting date.
 - **Fit scores you can trust.** A local LLM scores each job against your profile and resume (0–100, with a reason and matched/missing skills). Code overrides the model where it is unreliable: seniority, location and work-authorization rules.
 - **Company briefs.** A headless browser reads a company's own website and the model writes a brief with interview talking points, keeping only facts the pages contain.
@@ -120,7 +120,7 @@ flowchart LR
 
 ### Engineering quality
 
-- **122 tests:** unit tests for pure logic, and integration tests that boot real Postgres + pgvector in-process (PGlite) with every migration applied, then run the real search, ingest, scoring and server actions. No Docker needed to test.
+- **126 tests:** unit tests for pure logic, and integration tests that boot real Postgres + pgvector in-process (PGlite) with every migration applied, then run the real search, ingest, scoring and server actions. No Docker needed to test.
 - **Tests that can fail:** checked by deliberately breaking code (reverting the semantic cutoff or the re-embed rule makes tests fail).
 - **CI on every push:** lint, typecheck, tests, migrations on an empty pgvector Postgres, production build, then a demo build served and smoke-tested in headless Chromium (fails on any console error).
 - **Security:** every server action re-checks the signed-in user and validates input with Zod; one user can never read or change another's data (integration-tested); research only crawls a curated list of sites, never a user-supplied URL; sign-up can be closed or invite-only (enforced in the auth layer, covering OAuth too); password reset doesn't reveal which emails have accounts; account deletion cascades through every table.
@@ -132,7 +132,7 @@ flowchart LR
 
 | Area | Detail |
 |---|---|
-| Ingest | Zod-validated parsers for 3 board APIs; upsert by (source, board, external id); closed instead of deleted; failed fetch never closes jobs; re-embed only when title, description, company or location changes |
+| Ingest | Zod-validated parsers for 6 board APIs (SmartRecruiters needs a detail request per posting); upsert by (source, board, external id); closed instead of deleted; failed fetch never closes jobs; re-embed only when title, description, company or location changes |
 | Search | Postgres `websearch_to_tsquery` over a GIN index + pgvector cosine distance, merged by reciprocal rank fusion (k = 60); semantic hits kept only under `min(0.40, best + 0.08)` (measured on 18 queries); filters as SQL regex built from the same word lists as tested JS regexes |
 | Fit ranking | Scored ≥ 40 first, then unscored by embedding closeness, then poor scores; joins search results as a third ranked list |
 | Scoring | `qwen2.5:7b` via Ollama structured output: score, role fit, required years, quoted location rule, skills; code computes seniority, verifies the location rule against the posting's own sentences, strips non-skill tags, caps the score |
@@ -189,7 +189,7 @@ These are the "why did you…" answers.
 
 - *How do you know the scores are good?* The eval section: 48 labeled pairs, AUC vs. the embedding baseline, per-version results. Also its limits: a small set with draft labels, so the numbers show direction, not precision.
 - *Why not GPT-4 or Claude?* Cost and permanence: the goal was a tool that keeps working for free. The design (model extracts, code decides) is what makes a 7B model usable; a bigger model would slot in behind the same interface.
-- *How does it scale?* Exact vector scan is a few ms at ~7k rows; past ~100k jobs, add an HNSW index. Scoring is the bottleneck (~10–30 s per job on a laptop), which is why it runs in a queue and only for the top 30 candidates.
+- *How does it scale?* Exact vector scan is a few ms at ~8k rows; past ~100k jobs, add an HNSW index. Scoring is the bottleneck (~10–30 s per job on a laptop), which is why it runs in a queue and only for the top 30 candidates.
 - *What would you do next?* Bring-your-own-key model providers, a tailored resume grounded in the profile (never claiming skills the resume lacks), more job sources, smaller Docker images.
 
 ---
@@ -197,7 +197,7 @@ These are the "why did you…" answers.
 ## 8. LinkedIn / portfolio snippets
 
 **LinkedIn project description (≈ 600 chars):**
-> Shortlist is a self-hosted AI job search agent I built that costs $0 to run. It pulls ~7,200 live jobs daily from 33 companies' public career boards, ranks them with hybrid keyword + vector search in Postgres, and scores fit with a local LLM, with seniority and location rules enforced in code, which lifted ranking AUC from 0.71 to 0.91 on a labeled eval. It also researches companies with a headless browser, tracks applications, and exposes everything to Claude through an MCP server. Stack: Next.js 16, PostgreSQL + pgvector, Ollama, pg-boss, Playwright.
+> Shortlist is a self-hosted AI job search agent I built that costs $0 to run. It pulls ~8,300 live jobs daily from 45 companies' public career boards, ranks them with hybrid keyword + vector search in Postgres, and scores fit with a local LLM, with seniority and location rules enforced in code, which lifted ranking AUC from 0.71 to 0.91 on a labeled eval. It also researches companies with a headless browser, tracks applications, and exposes everything to Claude through an MCP server. Stack: Next.js 16, PostgreSQL + pgvector, Ollama, pg-boss, Playwright.
 
 **Skills to tag:** TypeScript · Next.js · React · PostgreSQL · pgvector · Vector Search · LLM Evaluation · Retrieval-Augmented Generation · Ollama · Playwright · Docker · GitHub Actions · Model Context Protocol
 
@@ -211,8 +211,8 @@ These are the "why did you…" answers.
 
 | Number | Value | Source |
 |---|---|---|
-| Companies | 33 | `lib/companies.ts` |
-| Open jobs | ~7,200 (7,225 on 2026-11-26) | local database after the daily refresh |
+| Companies | 45 (on 6 board platforms) | `config/companies.json` |
+| Open jobs | ~8,300 (8,268 on 2026-11-26, after adding 12 companies) | local database |
 | Demo snapshot | 1,272 jobs, 30 scored matches | `demo/pgdata.tar.gz`, README |
 | Ranking AUC, lenient† | 0.71 embeddings → 0.91 shipped | `evals/match/README.md`, `results/latest.json` |
 | Ranking AUC, strict† | 0.72 → 0.97 | same |
@@ -223,8 +223,8 @@ These are the "why did you…" answers.
 | Semantic cutoff | nonsense queries: 100 → 0 results | `lib/relevance.ts` (measured on 18 queries) |
 | Profile embedding | ~85 ms → ~1–2 ms per page load | measured, review 3.3 |
 | Crash recovery | up to 3 h → ~80 s | measured, review 2.1 |
-| Docker first run | 7,224 jobs ingested + embedded in 8.5 min | measured, review 3.4 |
-| Tests | 122 in 24 files (unit + integration) | `npm test` |
+| Docker first run | 7,224 jobs (33 companies) ingested + embedded in 8.5 min | measured, review 3.4 |
+| Tests | 126 in 24 files (unit + integration) | `npm test` |
 | Code | ~6,000 lines of TypeScript, 20+ commits, 10 migrations | repo |
 | MCP tools | 6 | `scripts/mcp.mts` |
 | Run cost | $0 | local models, Postgres, free Vercel plan |

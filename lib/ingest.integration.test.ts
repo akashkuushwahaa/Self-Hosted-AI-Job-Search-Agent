@@ -11,7 +11,8 @@ vi.mock("@/db", () => import("@/test/db"));
 vi.mock("./companies", () => ({ companies: [{ source: "greenhouse", board: "acme", name: "Acme", site: "https://acme.test" }] }));
 // The board's current listing; `null` makes the fetch fail like an outage.
 let listing: BoardJob[] | null = [];
-vi.mock("./boards", () => ({
+vi.mock("./boards", async (original) => ({
+  ...(await original<typeof import("./boards")>()),
   fetchBoard: async () => {
     if (!listing) throw new Error("HTTP 503");
     return listing;
