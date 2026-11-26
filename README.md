@@ -6,6 +6,10 @@ Self-hosted AI job search. No paid APIs, no free-tier keys that expire.
 
 Jobs come straight from companies' public career boards (Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Recruitee), which need no API key, into Postgres with full-text search.
 
+[![Shortlist in 55 seconds: hybrid search, filters, AI match scores with reasons, a company brief and the tracker](docs/media/shortlist-demo.gif)](https://shortlist-five-virid.vercel.app)
+
+**[Try the live demo](https://shortlist-five-virid.vercel.app)**: no sign-up, it runs on recorded data ([demo mode](#demo-mode-free-hosting-that-doesnt-expire)). The video above is that demo, recorded with `scripts/record-demo.mjs`.
+
 ## Run it
 
 With Docker, the whole thing is one command. You need [Ollama](https://ollama.com) with the two models (on macOS run it natively, since Docker there can't use the GPU; on Linux add `--profile ollama` and set `OLLAMA_DOCKER_URL=http://ollama:11434`):
@@ -44,7 +48,14 @@ Set `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`). Email/password s
 
 `DEMO_MODE=1` runs the whole app with no database server, model or API key. The database is [PGlite](https://pglite.dev) (Postgres compiled to WASM, with pgvector) loaded from a committed snapshot, `demo/pgdata.tar.gz`. That snapshot holds 1,272 real jobs, a fictional candidate's 30 scored matches, company briefs and a started tracker. The same Drizzle queries run against it. Model output is recorded rather than live: match scores and briefs are in the snapshot, and `demo/embeddings.json` holds the query embeddings for the demo profile and the sample searches, so semantic search works for those and any other search falls back to keyword. Visitors are signed in as the demo candidate. The tracker works, and each visitor's changes are their own: they live in a cookie layered over the snapshot (`lib/demo-tracker.ts`), never in the shared database. Scoring, research and profile edits explain that they run locally.
 
-Deploy on Vercel's free plan: import the repo and set `DEMO_MODE=1` and `BETTER_AUTH_SECRET`. No other services. To refresh the snapshot (needs Postgres, Ollama and the worker):
+Deploy on Vercel's free plan, no other services:
+
+1. On [vercel.com/new](https://vercel.com/new), import this GitHub repo. The framework preset (Next.js), build command and output are detected; leave them as they are.
+2. Add two environment variables (Production and Preview): `DEMO_MODE` = `1`, and `BETTER_AUTH_SECRET` = the output of `openssl rand -base64 32`. Nothing else: no database, model or URL variable. The site URL for auth and link previews comes from the domain Vercel injects (`lib/site-url.ts`).
+3. Deploy. Every push to `main` redeploys.
+4. Check it: `npm run smoke -- https://<your-project>.vercel.app` loads every public page in headless Chromium and fails on any error.
+
+Each function bundles the 16 MB snapshot and PGlite; the largest is about 73 MB, well under Vercel's 250 MB limit (checked on a clean checkout with only those two variables). To refresh the snapshot (needs Postgres, Ollama and the worker):
 
 ```bash
 npm run demo:seed    # demo candidate + queues their scoring and a few company briefs
@@ -100,4 +111,4 @@ claude mcp add shortlist -e SHORTLIST_USER_EMAIL=you@example.com -- npm run --si
 - [x] MCP server: search, matches, tracker and company briefs as tools for Claude
 - [x] Tailored resume points, summary and cover letter, grounded in the resume
 - [x] Demo mode: PGlite snapshot + recorded model output, deployable free on Vercel
-- [ ] Video
+- [x] Demo video (`docs/media/shortlist-demo.gif`, recorded by `scripts/record-demo.mjs`)

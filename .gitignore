@@ -87,3 +87,7 @@ Thumbs.db
 
 # ---------- Personal eval exports (contain a real profile and resume) ----------
 evals/match/*.local.json
+
+# ---------- Demo video sources (only the README GIF is committed) ----------
+docs/media/*.mp4
+docs/media/raw/

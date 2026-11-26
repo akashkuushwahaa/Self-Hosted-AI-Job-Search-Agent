@@ -3,7 +3,7 @@
 Everything needed to put this project on a resume, a portfolio site, LinkedIn or in an interview, in one file. Every number below is measured in this repo; the **Source** column of the [numbers sheet](#9-numbers-sheet) says where, so each one can be re-checked.
 
 > **Before using this file**
-> - Fill in the placeholders: `<DEMO_URL>` (the Vercel demo, once deployed) and `<YOUR NAME>`.
+> - Fill in `<YOUR NAME>`. The live demo is https://shortlist-five-virid.vercel.app (checked with `npm run smoke` on 2026-11-26).
 > - The match-scoring eval labels are drafts written with an AI assistant ([evals/match/README.md](../evals/match/README.md) says so). Review the 48 labels in `evals/match/pairs.json`, re-run `npm run eval:match`, and only then quote the AUC/F1 figures. They are marked † below.
 > - The project was built with heavy use of an AI coding assistant (Claude Code). Say so if asked, and be ready to explain every design decision in section 6: interviewers will ask why, not just what.
 
@@ -16,7 +16,7 @@ Everything needed to put this project on a resume, a portfolio site, LinkedIn or
 | **Name** | Shortlist: Self-Hosted AI Job Search Agent |
 | **One line** | A self-hosted job search app that pulls ~8,300 live jobs from 45 companies' career boards, ranks them with hybrid search, scores fit with a local LLM whose mistakes are corrected in code, researches companies with a headless browser, and tracks applications. No paid APIs. |
 | **Repo** | https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent |
-| **Live demo** | `<DEMO_URL>` (runs entirely on a PGlite snapshot; no server, model or key needed) |
+| **Live demo** | https://shortlist-five-virid.vercel.app (runs entirely on a PGlite snapshot; no server, model or key needed) |
 | **Role** | Solo: design, backend, frontend, ML evaluation, infra |
 | **When** | November 2026 |
 | **Size** | ~6,000 lines of TypeScript; 20+ commits; 10 database migrations; 141 tests (28 files) |
@@ -40,7 +40,7 @@ Pick the version that fits the role. Keep 3–4 bullets.
 
 ### AI / ML engineer version
 
-**Shortlist: Self-Hosted AI Job Search Agent** · TypeScript, Next.js, PostgreSQL/pgvector, Ollama, Playwright · [GitHub](https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent) · [Demo](<DEMO_URL>)
+**Shortlist: Self-Hosted AI Job Search Agent** · TypeScript, Next.js, PostgreSQL/pgvector, Ollama, Playwright · [GitHub](https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent) · [Demo](https://shortlist-five-virid.vercel.app)
 - Built a job-matching pipeline over ~8,300 live postings from 45 companies: hybrid search (Postgres full-text + pgvector embeddings fused with reciprocal rank fusion) and a local 7B LLM that scores candidate fit through structured JSON output.
 - Raised ranking AUC from 0.71 (embedding similarity) to 0.91† on a 48-pair labeled eval by letting the model extract facts (required years, the posting's location rule) and deciding seniority and location in code; caught 9/9 stated location rules with no false positives, up from 5/9.
 - Cut hallucinated output: company briefs keep a product or technology only if the crawled pages contain it (the model listed 8 technologies for one company, none of which appeared on its pages); a measured cosine-distance cutoff stops nonsense queries returning 100 "matches".
@@ -48,7 +48,7 @@ Pick the version that fits the role. Keep 3–4 bullets.
 
 ### Full-stack engineer version
 
-**Shortlist: Self-Hosted AI Job Search Agent** · Next.js 16, React 19, PostgreSQL, Drizzle, Tailwind · [GitHub](https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent) · [Demo](<DEMO_URL>)
+**Shortlist: Self-Hosted AI Job Search Agent** · Next.js 16, React 19, PostgreSQL, Drizzle, Tailwind · [GitHub](https://github.com/akashkuushwahaa/Self-Hosted-AI-Job-Search-Agent) · [Demo](https://shortlist-five-virid.vercel.app)
 - Built a full-stack job search app (search with filters, AI match scores, company research, drag-and-drop application tracker with optimistic updates, auth with sign-up controls, password reset and account deletion) on Next.js 16 server components and server actions.
 - Streamed background-job progress to the browser with Postgres LISTEN/NOTIFY and server-sent events: no polling and no extra message broker.
 - Shipped a zero-cost public demo: the whole app runs on a Postgres-in-WASM (PGlite) snapshot with recorded model output on Vercel's free plan, with per-visitor tracker state kept in a cookie so visitors never see each other's changes.
@@ -204,6 +204,8 @@ These are the "why did you…" answers.
 **Skills to tag:** TypeScript · Next.js · React · PostgreSQL · pgvector · Vector Search · LLM Evaluation · Retrieval-Augmented Generation · Ollama · Playwright · Docker · GitHub Actions · Model Context Protocol
 
 **Keywords (for ATS):** TypeScript, JavaScript, React 19, Next.js 16, Node.js, PostgreSQL, pgvector, full-text search, hybrid search, reciprocal rank fusion, embeddings, LLM, local LLM, Ollama, structured output, prompt engineering, LLM evaluation, AUC, precision/recall, Drizzle ORM, Zod, pg-boss, job queue, server-sent events, LISTEN/NOTIFY, Playwright, web scraping, Better Auth, OAuth, Tailwind CSS, Vitest, integration testing, PGlite, WebAssembly, Docker, Docker Compose, GitHub Actions, CI/CD, MCP (Model Context Protocol), Vercel.
+
+**Demo video:** `docs/media/shortlist-demo.gif` (in the README) and a 69 s MP4 made by `scripts/record-demo.mjs`; post the MP4 natively on LinkedIn, since uploaded video plays better there than a link.
 
 **Screenshots to take** (from the demo): home page, `/jobs?q=frontend internship in India` (shows "keyword + semantic"), a filtered list, `/matches` with scores and skill tags, a job page with its score and reason, `/company/vercel` brief, `/tracker`. The link preview image is `/opengraph-image`.
 
