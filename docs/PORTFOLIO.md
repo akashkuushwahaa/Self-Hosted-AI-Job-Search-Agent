@@ -192,7 +192,7 @@ These are the "why did you…" answers.
 - *How do you know the scores are good?* The eval section: 48 labeled pairs, AUC vs. the embedding baseline, per-version results. Also its limits: a small set with draft labels, so the numbers show direction, not precision.
 - *Why not GPT-4 or Claude?* Cost and permanence: the goal was a tool that keeps working for free. The design (model extracts, code decides) is what makes a 7B model usable; a bigger model would slot in behind the same interface.
 - *How does it scale?* Exact vector scan is a few ms at ~8k rows; past ~100k jobs, add an HNSW index. Scoring is the bottleneck (~10–30 s per job on a laptop), which is why it runs in a queue and only for the top 30 candidates.
-- *What would you do next?* Catch softer inflation in tailored letters ("significant contributions") with a second model pass that must cite evidence per sentence; bring-your-own-key model providers; smaller Docker images.
+- *What would you do next?* Catch softer inflation in tailored letters ("significant contributions") with a second model pass that must cite evidence per sentence; smaller Docker images (a standalone Next build and a compiled worker). Paid model providers were considered and deliberately left out: the point is that it runs locally for free.
 
 ---
 

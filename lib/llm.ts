@@ -3,7 +3,7 @@ import { z } from "zod";
 const OLLAMA_URL = process.env.OLLAMA_URL ?? "http://localhost:11434";
 export const CHAT_MODEL = process.env.CHAT_MODEL ?? "qwen2.5:7b";
 
-// shortcut: Ollama is the only provider; add an LLM_PROVIDER switch here for bring-your-own-key APIs.
+// Ollama only, by design: Shortlist stays local and free, so there is no paid-API provider switch.
 export async function generateJson<T extends z.ZodType>(schema: T, system: string, user: string): Promise<z.infer<T>> {
   const res = await fetch(`${OLLAMA_URL}/api/chat`, {
     method: "POST",

@@ -91,7 +91,7 @@ claude mcp add shortlist -e SHORTLIST_USER_EMAIL=you@example.com -- npm run --si
 - [x] Resume fills in the profile; jobs ranked by fit to your resume; job detail page
 - [x] Local embeddings (Ollama) + pgvector hybrid search
 - [x] Local LLM match scoring (Ollama) with code-enforced gates, and a labeled eval set
-- [ ] Bring-your-own-key providers (OpenAI / Anthropic) and recorded replies for demo mode
+- [x] Local models only, by design: no paid API providers (decided 2026-11-26)
 - [x] Background scoring worker (pg-boss) with live progress over SSE (Postgres LISTEN/NOTIFY)
 - [x] Daily ingest → embed → score on a schedule, with "new since your last visit"
 - [x] Playwright company research as a worker job, with code-checked product and tech names
