@@ -2,11 +2,11 @@
 // Runs locally as one user (SHORTLIST_USER_EMAIL). Stdout is the protocol: log only to stderr.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { client, db } from "../db";
 import { user } from "../db/auth-schema"; // star re-exports from schema.ts aren't visible to ESM scripts under tsx
-import { applications, companyResearch, jobs, matches, profiles } from "../db/schema";
+import { applicationDetails, applications, companyResearch, jobs, matches, profiles } from "../db/schema";
 import { companies, companyByBoard } from "../lib/companies";
 import { COUNTRY_OPTIONS, filterParams, LEVELS, type Level } from "../lib/filters";
 import { splitSkills } from "../lib/skills";
@@ -108,16 +108,20 @@ server.registerTool(
 server.registerTool(
   "list_tracker",
   {
-    description: `Your application tracker: tracked jobs and their status (${STATUSES.join(", ")}).`,
+    description: `Your application tracker: tracked jobs, their status (${STATUSES.join(", ")}), and your applied date, next step, follow-up date and notes.`,
     annotations: { readOnlyHint: true },
   },
   async () => {
     const userId = await currentUserId();
     if (!userId) return fail(NO_USER);
     const rows = await db
-      .select({ jobId: jobs.id, title: jobs.title, company: jobs.company, url: jobs.url, status: applications.status, closed: jobs.closedAt })
+      .select({
+        jobId: jobs.id, title: jobs.title, company: jobs.company, url: jobs.url, status: applications.status, closed: jobs.closedAt,
+        appliedOn: applicationDetails.appliedOn, nextStep: applicationDetails.nextStep, followUpOn: applicationDetails.followUpOn, notes: applicationDetails.notes,
+      })
       .from(applications)
       .innerJoin(jobs, eq(jobs.id, applications.jobId))
+      .leftJoin(applicationDetails, and(eq(applicationDetails.userId, applications.userId), eq(applicationDetails.jobId, applications.jobId)))
       .where(eq(applications.userId, userId));
     return json(rows.map(({ closed, ...r }) => ({ ...r, stillListed: closed == null })));
   },
@@ -126,11 +130,20 @@ server.registerTool(
 server.registerTool(
   "track_job",
   {
-    description: "Add a job to your tracker, or set its status if it is already there.",
-    inputSchema: { job_id: z.uuid(), status: z.enum(STATUSES).default("saved") },
+    description:
+      "Add a job to your tracker, or set its status if it is already there. Optionally set the applied date, next step, " +
+      "follow-up date (YYYY-MM-DD) or notes; fields left out keep their current value.",
+    inputSchema: {
+      job_id: z.uuid(),
+      status: z.enum(STATUSES).default("saved"),
+      applied_on: z.iso.date().optional(),
+      next_step: z.string().max(200).optional(),
+      follow_up_on: z.iso.date().optional(),
+      notes: z.string().max(5000).optional(),
+    },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true },
   },
-  async ({ job_id, status }) => {
+  async ({ job_id, status, applied_on, next_step, follow_up_on, notes }) => {
     const userId = await currentUserId();
     if (!userId) return fail(NO_USER);
     const [job] = await db.select({ title: jobs.title, company: jobs.company }).from(jobs).where(eq(jobs.id, job_id));
@@ -139,7 +152,16 @@ server.registerTool(
       .insert(applications)
       .values({ userId, jobId: job_id, status })
       .onConflictDoUpdate({ target: [applications.userId, applications.jobId], set: { status } });
-    return json({ tracked: `${job.title} at ${job.company}`, status });
+    const details = Object.fromEntries(
+      Object.entries({ appliedOn: applied_on, nextStep: next_step, followUpOn: follow_up_on, notes }).filter(([, v]) => v !== undefined),
+    );
+    if (Object.keys(details).length) {
+      await db
+        .insert(applicationDetails)
+        .values({ userId, jobId: job_id, ...details })
+        .onConflictDoUpdate({ target: [applicationDetails.userId, applicationDetails.jobId], set: details });
+    }
+    return json({ tracked: `${job.title} at ${job.company}`, status, ...details });
   },
 );
 

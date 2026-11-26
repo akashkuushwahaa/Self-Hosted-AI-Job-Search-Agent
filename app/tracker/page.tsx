@@ -3,7 +3,9 @@ import { inArray } from "drizzle-orm";
 import { Suspense } from "react";
 import { db } from "@/db";
 import { jobs } from "@/db/schema";
-import { userApplications } from "@/lib/applications";
+import { detailsFor, userApplications } from "@/lib/applications";
+import { DEMO } from "@/lib/demo";
+import { localToday } from "@/lib/tracker";
 import { requireUser } from "@/lib/session";
 import { Muted, PageHeader } from "../ui";
 import { Board } from "./board";
@@ -31,11 +33,12 @@ async function Applications() {
         .where(inArray(jobs.id, tracked.map((a) => a.jobId)))
     : [];
   const byId = new Map(found.map(({ id, closed, ...job }) => [id, { ...job, closed: closed != null }]));
+  const details = await detailsFor(user.id, tracked.map((a) => a.jobId));
   const cards = tracked.flatMap((a) => {
     const job = byId.get(a.jobId);
-    return job ? [{ jobId: a.jobId, status: a.status, ...job }] : [];
+    return job ? [{ jobId: a.jobId, status: a.status, ...job, details: details.get(a.jobId) ?? null }] : [];
   });
 
   // Board renders even when empty, so the Undo toast survives removing the last card.
-  return <Board cards={cards} />;
+  return <Board cards={cards} today={localToday()} editable={!DEMO} />;
 }

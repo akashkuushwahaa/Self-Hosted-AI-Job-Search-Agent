@@ -1,9 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/db";
-import { applications, jobs } from "@/db/schema";
+import { applicationDetails, applications, jobs } from "@/db/schema";
 import { addUser, reset } from "@/test/db";
-import { moveApplication, trackJob, untrackJob } from "./actions";
+import { moveApplication, saveDetails, trackJob, untrackJob } from "./actions";
 
 vi.mock("@/db", () => import("@/test/db"));
 vi.mock("next/cache", () => ({ refresh: () => {} }));
@@ -60,5 +60,51 @@ describe("tracker actions", () => {
     await trackJob(jobId);
     expect(await moveApplication(jobId, "hired")).toHaveProperty("error");
     expect(await status("alice")).toBe("saved");
+  });
+});
+
+describe("tracker details", () => {
+  const form = (fields: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries(fields)) f.set(k, v);
+    return f;
+  };
+  const details = async (userId: string) =>
+    (await db.select().from(applicationDetails).where(and(eq(applicationDetails.userId, userId), eq(applicationDetails.jobId, jobId))))[0] ?? null;
+
+  it("saves notes and dates for the user's own card only", async () => {
+    await trackJob(jobId);
+    expect(await saveDetails(jobId, null, form({ nextStep: "Phone screen", followUpOn: "2026-12-01", notes: "Referred by Sam" }))).toEqual({ ok: true });
+    expect(await details("alice")).toMatchObject({ nextStep: "Phone screen", followUpOn: "2026-12-01", notes: "Referred by Sam", appliedOn: null });
+
+    signedIn = "bob"; // not on bob's board
+    expect(await saveDetails(jobId, null, form({ notes: "mine now" }))).toEqual({ error: "That job isn't on your board any more." });
+    expect(await details("bob")).toBeNull();
+    expect((await details("alice"))?.notes).toBe("Referred by Sam");
+  });
+
+  it("rejects a bad date without saving", async () => {
+    await trackJob(jobId);
+    expect(await saveDetails(jobId, null, form({ followUpOn: "next week" }))).toHaveProperty("error");
+    expect(await details("alice")).toBeNull();
+  });
+
+  it("records the applied date on the first move to Applied, never overwriting one the user set", async () => {
+    await trackJob(jobId);
+    await moveApplication(jobId, "applied");
+    expect((await details("alice"))?.appliedOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    await saveDetails(jobId, null, form({ appliedOn: "2026-11-01" }));
+    await moveApplication(jobId, "saved");
+    await moveApplication(jobId, "applied");
+    expect((await details("alice"))?.appliedOn).toBe("2026-11-01");
+  });
+
+  it("keeps notes through Remove and Undo", async () => {
+    await trackJob(jobId);
+    await saveDetails(jobId, null, form({ notes: "Keep me" }));
+    await untrackJob(jobId);
+    await trackJob(jobId, "saved");
+    expect((await details("alice"))?.notes).toBe("Keep me");
   });
 });

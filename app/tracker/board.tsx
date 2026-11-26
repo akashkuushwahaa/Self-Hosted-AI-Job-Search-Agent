@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useOptimistic, useState, useTransition } from "react";
-import { groupByStatus, STATUS_LABELS, STATUSES, type Status } from "@/lib/tracker";
+import { followUpDue, groupByStatus, STATUS_LABELS, STATUSES, type Details, type Status } from "@/lib/tracker";
 import { errorClass, linkClass } from "../ui";
+import { DetailsForm, DetailsSummary, useToday } from "./card-details";
 import { moveApplication, trackJob, untrackJob, type TrackerResult } from "./actions";
 
 type Card = {
@@ -15,6 +16,7 @@ type Card = {
   location: string | null;
   url: string;
   closed: boolean;
+  details: Details | null;
 };
 
 type Change = { jobId: string; status: Status | null } | { restore: Card };
@@ -25,7 +27,10 @@ const UNDO_MS = 6_000;
 // Network failures and server faults reject; expected failures come back as { error }.
 const attempt = (action: Promise<TrackerResult>, fallback: string) => action.catch(() => ({ error: fallback }));
 
-export function Board({ cards }: { cards: Card[] }) {
+// `today` is the server's date, used only until the browser's own date takes over (useToday).
+// `editable` is false in the demo, whose snapshot has no place for notes and dates.
+export function Board({ cards, today: serverToday, editable }: { cards: Card[]; today: string; editable: boolean }) {
+  const today = useToday(serverToday);
   const [, startTransition] = useTransition();
   const [notice, setNotice] = useState<Notice | null>(null);
   // Cards move instantly; the server's version replaces this once the action finishes, so a failed
@@ -62,8 +67,23 @@ export function Board({ cards }: { cards: Card[] }) {
     });
 
   const columns = groupByStatus(optimistic);
+  const due = optimistic.filter((c) => {
+    const d = followUpDue(c.details?.followUpOn ?? null, c.status, today);
+    return d === "overdue" || d === "today";
+  });
   return (
     <>
+      {due.length > 0 && (
+        <p className="mt-6 rounded-lg border border-red-500/25 bg-red-500/5 px-4 py-3 text-sm">
+          <span className="font-medium">{due.length === 1 ? "1 follow-up due" : `${due.length} follow-ups due`}:</span>{" "}
+          {due.map((c, i) => (
+            <span key={c.jobId}>
+              {i > 0 && ", "}
+              {c.title} at {c.company}
+            </span>
+          ))}
+        </p>
+      )}
       {optimistic.length === 0 ? (
         <p className="mt-6 rounded-lg border border-dashed border-border px-4 py-10 text-center text-sm text-muted">
           Nothing tracked yet. Use <strong className="text-foreground">Track</strong> on a job in{" "}
@@ -99,6 +119,7 @@ export function Board({ cards }: { cards: Card[] }) {
                       {c.location && ` · ${c.location}`}
                     </p>
                     {c.closed && <p className="mt-1.5 text-xs text-amber-700 dark:text-amber-400">No longer listed</p>}
+                    <DetailsSummary details={c.details} status={c.status} today={today} />
                     <div className="mt-3 flex items-center justify-between gap-2">
                       {/* Keyboard and touch alternative to dragging. */}
                       <label className="sr-only" htmlFor={`status-${c.jobId}`}>Status for {c.title}</label>
@@ -112,6 +133,7 @@ export function Board({ cards }: { cards: Card[] }) {
                       </select>
                       <button onClick={() => remove(c)} className="h-8 shrink-0 rounded-md px-1.5 text-xs text-muted transition-[color] duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-accent">Remove</button>
                     </div>
+                    <DetailsForm jobId={c.jobId} title={c.title} details={c.details} editable={editable} />
                   </li>
                 ))}
               </ul>

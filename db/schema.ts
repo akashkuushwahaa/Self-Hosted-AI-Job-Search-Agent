@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid, vector } from "drizzle-orm/pg-core";
+import { date, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid, vector } from "drizzle-orm/pg-core";
 import type { Dossier } from "../lib/dossier";
 import { STATUSES } from "../lib/tracker";
 import { user } from "./auth-schema";
@@ -64,6 +64,30 @@ export const profileEmbeddings = pgTable("profile_embeddings", {
   key: text().notNull(),
   embedding: vector({ dimensions: 768 }).notNull(),
 });
+
+// What the user notes about a tracked job. Keyed by user and job rather than tied to the
+// applications row, so notes survive Remove and Undo. Its own table, not applications columns,
+// so the demo snapshot (which predates it) keeps working.
+export const applicationDetails = pgTable(
+  "application_details",
+  {
+    userId: text()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    jobId: uuid()
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    appliedOn: date(),
+    nextStep: text(),
+    followUpOn: date(),
+    notes: text(),
+    updatedAt: timestamp({ withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.jobId] })],
+);
 
 // When the user last looked at /matches, for "N new since your last visit" after the daily run.
 // Its own table for the same reason as profile_embeddings: the demo snapshot predates it.

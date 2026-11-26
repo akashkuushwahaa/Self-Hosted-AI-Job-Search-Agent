@@ -73,8 +73,9 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 - **Done:** `ScoreJob` takes an optional `jobId`; `scoreOne` (`lib/scoring.ts`, integration-tested) scores and stores that job, skips the model if it's already scored, and tags progress events with the `jobId`. Its `singletonKey` is `user:job`, so it never collides with a full run. "Score this job" on the job page streams progress and refreshes the page when the score lands; `/matches`' button ignores single-job events. Checked end to end with Ollama: queued with no worker, then started the worker; the page updated itself with the score.
 
 ### 2.4 A fuller tracker
-- [ ] **Where:** `db/schema.ts` (`applications`), `app/tracker/`
+- [x] **Where:** `db/schema.ts` (`applications`), `app/tracker/`
 - **Fix:** Add notes, applied date and next step / follow-up date (with a new migration via `npm run db:generate`). Show overdue follow-ups. Update the MCP `track_job` / `list_tracker` tools to match.
+- **Done:** A separate `application_details` table (migration 0009) keyed by user and job, not new `applications` columns, so the demo snapshot keeps working and notes survive Remove → Undo. Applied date, next step, follow-up date, notes; `parseDetails` and `followUpDue` are unit-tested (offers and rejections never nag), and the actions are integration-tested (only your own card, bad dates rejected, applied date set on the first move to Applied and never overwriting one you set). Overdue follow-ups use the browser's date (`useSyncExternalStore`, so no hydration mismatch when the server runs in UTC). Demo shows the form read-only. MCP `track_job` takes the fields (left-out fields stay as they are) and `list_tracker` returns them; checked through a real MCP client.
 
 ### 2.5 Feedback: hide and rate jobs
 - [ ] **Where:** new table, `lib/search.ts` (`fitOrder`), `lib/candidates.ts`

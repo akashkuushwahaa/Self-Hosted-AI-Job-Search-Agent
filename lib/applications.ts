@@ -1,7 +1,7 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { db } from "@/db";
-import { applications, matches } from "@/db/schema";
+import { applicationDetails, applications, matches } from "@/db/schema";
 import { DEMO } from "./demo";
 import { applyOverlay, COOKIE, parseOverlay } from "./demo-tracker";
 
@@ -39,4 +39,20 @@ export async function matchScores(userId: string, jobIds: string[]) {
     .from(matches)
     .where(and(eq(matches.userId, userId), inArray(matches.jobId, jobIds)));
   return new Map(rows.map((r) => [r.jobId, r.score]));
+}
+
+// Notes and dates for these tracked jobs. The demo snapshot predates the table, so the demo has none.
+export async function detailsFor(userId: string, jobIds: string[]) {
+  if (DEMO || !jobIds.length) return new Map<string, Omit<typeof applicationDetails.$inferSelect, "userId" | "jobId" | "updatedAt">>();
+  const rows = await db
+    .select({
+      jobId: applicationDetails.jobId,
+      appliedOn: applicationDetails.appliedOn,
+      nextStep: applicationDetails.nextStep,
+      followUpOn: applicationDetails.followUpOn,
+      notes: applicationDetails.notes,
+    })
+    .from(applicationDetails)
+    .where(and(eq(applicationDetails.userId, userId), inArray(applicationDetails.jobId, jobIds)));
+  return new Map(rows.map(({ jobId, ...d }) => [jobId, d]));
 }
