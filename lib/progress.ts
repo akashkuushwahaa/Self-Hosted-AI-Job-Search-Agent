@@ -3,7 +3,8 @@ import { client } from "@/db";
 export const PROGRESS_CHANNEL = "progress";
 
 export type Progress =
-  | { kind: "score"; userId: string; done: number; total: number; state: "running" | "finished" | "failed" }
+  // jobId: a single job scored from its page; absent for a run over the top candidates.
+  | { kind: "score"; userId: string; jobId?: string; done: number; total: number; state: "running" | "finished" | "failed" }
   // No userId: research events go to every signed-in user, so they must not say who asked.
   | { kind: "research"; board: string; step: string; state: "running" | "finished" | "failed" };
 

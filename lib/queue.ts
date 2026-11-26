@@ -1,7 +1,9 @@
 import { PgBoss } from "pg-boss";
 
 export const SCORE_QUEUE = "score-matches";
-export type ScoreJob = { userId: string };
+// jobId: score just that job (from its page). singletonKey `${userId}:${jobId}`, so it runs beside a
+// full run instead of being refused by the exclusive policy.
+export type ScoreJob = { userId: string; jobId?: string };
 export const RESEARCH_QUEUE = "research-company";
 export type ResearchJob = { board: string; userId: string };
 export const REFRESH_QUEUE = "refresh-jobs";

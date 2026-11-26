@@ -9,10 +9,12 @@ import { db } from "@/db";
 import { companyResearch, jobs, matches } from "@/db/schema";
 import { trackedJobIds } from "@/lib/applications";
 import { getProfile } from "@/lib/candidates";
+import { DEMO } from "@/lib/demo";
 import { splitSkills } from "@/lib/skills";
 import { getUser } from "@/lib/session";
 import { cleanReason, toBlocks } from "@/lib/text";
 import { TrackButton } from "../../track-button";
+import { ScoreJobButton } from "./score-job-button";
 import { buttonClass, linkClass, Muted, PageHeader, ScoreBadge, Tag } from "../../ui";
 
 export async function generateMetadata({ params }: PageProps<"/jobs/[id]">): Promise<Metadata> {
@@ -97,9 +99,10 @@ async function Job({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
         </Section>
       )}
       {user && !match && (
-        <Muted className="mt-8">
-          Not scored for you yet. Scores come from <Link href="/matches" className={linkClass}>For you</Link>, which scores the jobs closest to your profile.
-        </Muted>
+        <Section title="Your match">
+          <Muted>Not scored for you yet. <Link href="/matches" className={linkClass}>For you</Link> scores the jobs closest to your profile; you can score this one now.</Muted>
+          {!DEMO && <div className="mt-3"><ScoreJobButton jobId={job.id} /></div>}
+        </Section>
       )}
 
       {brief && (

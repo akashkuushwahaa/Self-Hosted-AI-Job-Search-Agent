@@ -67,9 +67,10 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 - **Done:** No stored `country` / `remote` / level columns (a new `jobs` column would break the demo snapshot, and need a backfill): `lib/filters.ts` (unit-tested) turns each filter into a whole-word pattern over the title or location, generated from one word list as both a Postgres regex and a JS `RegExp`. Over all open jobs the two agree exactly for every level, remote and all 15 countries. Applied in `lib/search.ts` to the fit, recent, keyword and semantic paths; checked that every returned row satisfies the filters on all four paths. `/jobs` has GET selects (works without JS; empty fields are redirected away so URLs stay clean), pagination and sort links keep filters, "Clear filters" resets them. The MCP `search_jobs` tool takes the same filters and now allows an empty query. In demo mode "posted within" counts back from the snapshot's newest posting, so it doesn't decay to zero as the frozen snapshot ages. Country coverage is limited to the 15 countries `lib/location.ts` knows.
 
 ### 2.3 Score one job on demand
-- [ ] **Where:** `app/jobs/[id]/page.tsx:89-93`, `lib/scoring.ts`, `lib/queue.ts`
+- [x] **Where:** `app/jobs/[id]/page.tsx:89-93`, `lib/scoring.ts`, `lib/queue.ts`
 - **Problem:** The job page says "Not scored for you yet" with no way to score it; only the 30 nearest jobs on `/matches` get scored.
 - **Fix:** Add a "Score this job" button that queues a single-job scoring run (new queue or a `jobId` field on `ScoreJob`) and streams progress like `ScoreButton` does.
+- **Done:** `ScoreJob` takes an optional `jobId`; `scoreOne` (`lib/scoring.ts`, integration-tested) scores and stores that job, skips the model if it's already scored, and tags progress events with the `jobId`. Its `singletonKey` is `user:job`, so it never collides with a full run. "Score this job" on the job page streams progress and refreshes the page when the score lands; `/matches`' button ignores single-job events. Checked end to end with Ollama: queued with no worker, then started the worker; the page updated itself with the score.
 
 ### 2.4 A fuller tracker
 - [ ] **Where:** `db/schema.ts` (`applications`), `app/tracker/`
@@ -117,6 +118,7 @@ State at review time: commit `a16a668`. Lint, typecheck and all 62 unit tests pa
 - [ ] **Where:** `docker-compose.yml`, new `Dockerfile`
 - **Problem:** Compose only runs Postgres, and the README setup takes nine commands. If the worker isn't running, the UI shows "Queued, waiting for the worker…" forever.
 - **Fix:** Add a Dockerfile and `app`, `worker` and optional `ollama` services, so `docker compose up` is the whole setup. In the UI, if a queued job hasn't started after ~30s, say the worker may not be running.
+- **Partly done (with 2.3):** both scoring buttons now say "Still waiting. Is the worker running?" when a queued job hasn't started after 30 s (`app/use-worker-hint.ts`; seen in the browser). Dockerfile and compose services still to do.
 
 ### 3.5 Get the demo snapshot out of git history
 - [ ] **Where:** `demo/pgdata.tar.gz` (16 MB)

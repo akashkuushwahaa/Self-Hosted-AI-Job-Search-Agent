@@ -2,7 +2,7 @@
 import { getBoss, REFRESH_QUEUE, RESEARCH_QUEUE, SCORE_QUEUE, type ResearchJob, type ScoreJob } from "../lib/queue";
 import { refreshJobs } from "../lib/refresh";
 import { researchCompany } from "../lib/research-run";
-import { scoreUnscored } from "../lib/scoring";
+import { scoreOne, scoreUnscored } from "../lib/scoring";
 
 // Daily ingest → embed → score, in this machine's time zone. "off" turns it off.
 const REFRESH_CRON = process.env.REFRESH_CRON ?? "0 6 * * *";
@@ -10,9 +10,10 @@ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const boss = await getBoss();
 await boss.work<ScoreJob>(SCORE_QUEUE, async ([job]) => {
-  console.log(`scoring for ${job.data.userId}`);
-  await scoreUnscored(job.data.userId);
-  console.log(`done for ${job.data.userId}`);
+  const { userId, jobId } = job.data;
+  console.log(jobId ? `scoring job ${jobId} for ${userId}` : `scoring for ${userId}`);
+  await (jobId ? scoreOne(userId, jobId) : scoreUnscored(userId));
+  console.log(`done for ${userId}`);
 });
 await boss.work<ResearchJob>(RESEARCH_QUEUE, async ([job]) => {
   console.log(`researching ${job.data.board}`);
