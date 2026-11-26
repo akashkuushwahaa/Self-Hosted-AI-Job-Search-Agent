@@ -11,14 +11,14 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "ingest": "tsx --env-file=.env scripts/ingest.mts",
-    "embed": "tsx --env-file=.env scripts/embed.mts",
-    "eval:match": "tsx --env-file=.env evals/match/run.mts",
-    "worker": "tsx --env-file=.env scripts/worker.mts",
-    "mcp": "tsx --env-file=.env scripts/mcp.mts",
+    "ingest": "tsx --env-file-if-exists=.env scripts/ingest.mts",
+    "embed": "tsx --env-file-if-exists=.env scripts/embed.mts",
+    "eval:match": "tsx --env-file-if-exists=.env evals/match/run.mts",
+    "worker": "tsx --env-file-if-exists=.env scripts/worker.mts",
+    "mcp": "tsx --env-file-if-exists=.env scripts/mcp.mts",
     "smoke": "tsx scripts/smoke.mts",
-    "demo:seed": "tsx --env-file=.env scripts/demo-seed.mts",
-    "demo:build": "tsx --env-file=.env scripts/build-demo.mts"
+    "demo:seed": "tsx --env-file-if-exists=.env scripts/demo-seed.mts",
+    "demo:build": "tsx --env-file-if-exists=.env scripts/build-demo.mts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.6.0",

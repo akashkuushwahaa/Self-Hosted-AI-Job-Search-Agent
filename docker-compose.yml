@@ -1,3 +1,24 @@
+# `docker compose up -d` runs everything: Postgres, migrations, the app on :3000 and the worker
+# (scoring, research, and the daily ingest → embed → score; on an empty database it fetches jobs
+# right away). Needs BETTER_AUTH_SECRET in .env. Models come from Ollama:
+#   - macOS: run Ollama natively (Docker on macOS can't use the GPU); the default URL reaches it.
+#   - Linux: `docker compose --profile ollama up -d` also runs Ollama in a container and pulls the
+#     models; set OLLAMA_DOCKER_URL=http://ollama:11434 in .env.
+# For local development, `docker compose up -d db` starts only Postgres, as before.
+
+x-app: &app
+  env_file: [{ path: .env, required: false }] # optional settings: GitHub sign-in, SMTP, sign-up rules, REFRESH_CRON, TZ…
+  environment:
+    # These override .env, whose URLs point at localhost for running outside Docker.
+    DATABASE_URL: postgres://shortlist:shortlist@db:5432/shortlist
+    OLLAMA_URL: ${OLLAMA_DOCKER_URL:-http://host.docker.internal:11434}
+    BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in .env (openssl rand -base64 32)}
+    BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+  extra_hosts: ["host.docker.internal:host-gateway"] # Linux; Docker Desktop already has it
+  depends_on:
+    migrate: { condition: service_completed_successfully }
+  restart: unless-stopped
+
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -12,5 +33,39 @@ services:
       interval: 2s
       retries: 30
 
+  # Applies every migration, then exits; the app and worker start after it succeeds.
+  migrate:
+    build: { context: ., target: app } # same cached stages as app
+    environment:
+      DATABASE_URL: postgres://shortlist:shortlist@db:5432/shortlist
+    command: ["npm", "run", "db:migrate"]
+    depends_on:
+      db: { condition: service_healthy }
+
+  app:
+    <<: *app
+    image: shortlist-app
+    build: { context: ., target: app }
+    ports: ["3000:3000"]
+
+  worker:
+    <<: *app
+    image: shortlist-worker
+    build: { context: ., target: worker }
+
+  ollama:
+    profiles: [ollama]
+    image: ollama/ollama
+    volumes: [ollama:/root/.ollama]
+
+  # Pulls the two models into the ollama volume once (skips ones already there), then exits.
+  ollama-pull:
+    profiles: [ollama]
+    image: ollama/ollama
+    environment: { OLLAMA_HOST: ollama:11434 }
+    entrypoint: ["sh", "-c", "ollama pull nomic-embed-text && ollama pull qwen2.5:7b"]
+    depends_on: [ollama]
+
 volumes:
   pgdata:
+  ollama:

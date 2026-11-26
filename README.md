@@ -8,9 +8,21 @@ Jobs come straight from companies' public career boards (Greenhouse, Lever, Ashb
 
 ## Run it
 
+With Docker, the whole thing is one command. You need [Ollama](https://ollama.com) with the two models (on macOS run it natively, since Docker there can't use the GPU; on Linux add `--profile ollama` and set `OLLAMA_DOCKER_URL=http://ollama:11434`):
+
+```bash
+cp .env.example .env          # then set BETTER_AUTH_SECRET (openssl rand -base64 32), and TZ for the daily run
+ollama pull nomic-embed-text && ollama pull qwen2.5:7b
+docker compose up -d          # Postgres, migrations, the app on :3000, and the worker
+```
+
+On an empty database the worker fetches and embeds every job right away (about 8 minutes for 7k jobs on an M-series Mac), then refreshes daily.
+
+For development, run it from source:
+
 ```bash
 cp .env.example .env
-docker compose up -d --wait   # Postgres 16 + pgvector
+docker compose up -d --wait db   # Postgres 16 + pgvector only
 npm install
 npm run db:migrate
 npm run ingest                # ~7k jobs from 33 companies, about a minute
