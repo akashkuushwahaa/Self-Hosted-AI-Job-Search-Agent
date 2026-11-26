@@ -8,8 +8,10 @@ import { companyResearch, jobs } from "@/db/schema";
 import { companyByBoard } from "@/lib/companies";
 import { DEMO } from "@/lib/demo";
 import { isFresh } from "@/lib/dossier";
+import { RESEARCH_QUEUE } from "@/lib/queue";
+import { lastRun, timeAgo } from "@/lib/run-status";
 import { getUser } from "@/lib/session";
-import { linkClass, Muted, PageHeader, Tag } from "../../ui";
+import { errorClass, linkClass, Muted, PageHeader, Tag } from "../../ui";
 import { ResearchButton } from "./research-button";
 
 // From the curated list, so no query: the title is known as soon as the params are.
@@ -57,6 +59,7 @@ async function Company({ params }: Pick<PageProps<"/company/[board]">, "params">
     db.select().from(companyResearch).where(eq(companyResearch.board, board)),
     db.select({ open: count() }).from(jobs).where(and(eq(jobs.board, board), isNull(jobs.closedAt))),
   ]);
+  const run = await lastRun(RESEARCH_QUEUE, board).catch(() => null);
   const stale = !isFresh(research?.researchedAt);
   const d = research?.dossier;
 
@@ -77,6 +80,15 @@ async function Company({ params }: Pick<PageProps<"/company/[board]">, "params">
           <ResearchButton board={board} label={research ? "Refresh research" : "Research this company"} />
         ) : null}
       </PageHeader>
+
+      {run?.state === "failed" && (
+        <p role="alert" className={`mt-6 ${errorClass}`}>
+          The last research run failed {timeAgo(run.at)}{run.error ? `: ${run.error}` : ""}.
+        </p>
+      )}
+      {(run?.state === "queued" || run?.state === "running") && (
+        <Muted className="mt-6">Research is {run.state === "queued" ? "waiting for the worker" : "in progress"} (started {timeAgo(run.at)}).</Muted>
+      )}
 
       {d ? (
         <article className="mt-8 max-w-prose">

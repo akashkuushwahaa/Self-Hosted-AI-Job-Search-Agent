@@ -7,6 +7,8 @@ export type ScoreJob = { userId: string; jobId?: string };
 export const RESEARCH_QUEUE = "research-company";
 export type ResearchJob = { board: string; userId: string };
 export const REFRESH_QUEUE = "refresh-jobs";
+export const PROFILE_QUEUE = "fill-profile";
+export type ProfileJob = { userId: string };
 
 // One started instance per process; kept on globalThis so Next dev's hot reload doesn't open new pools.
 const g = globalThis as unknown as { boss?: Promise<PgBoss> };
@@ -23,6 +25,7 @@ export function getBoss(): Promise<PgBoss> {
       [SCORE_QUEUE, 3600],
       [RESEARCH_QUEUE, 600],
       [REFRESH_QUEUE, 3 * 3600],
+      [PROFILE_QUEUE, 600], // singletonKey=userId: one resume read at a time per user
     ] as const;
     for (const [name, expireInSeconds] of queues) {
       await boss.createQueue(name, { policy: "exclusive", expireInSeconds, retryLimit: 1 });

@@ -1,6 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
+import type { Progress } from "@/lib/progress";
+import { useWorkerHint, WORKER_HINT } from "../use-worker-hint";
 import type { profiles } from "@/db/schema";
 import { buttonClass, errorClass, inputClass as input, labelClass } from "../ui";
 import { deleteAccount, saveProfile, uploadResume, type FormState } from "./actions";
@@ -19,6 +22,7 @@ export function ProfileForms({ name, email, profile }: Props) {
   const [saveState, save, saving] = useActionState(saveProfile, null);
   const [uploadState, upload, uploading] = useActionState(uploadResume, null);
   const [deleteState, remove, deleting] = useActionState(deleteAccount, null);
+  const fill = useProfileFill(Boolean(uploadState?.queued), uploadState);
 
   return (
     <div className="mt-8 max-w-2xl space-y-10">
@@ -67,8 +71,9 @@ export function ProfileForms({ name, email, profile }: Props) {
           Fill in my profile from it (empty fields only; adds skills it finds)
         </label>
         <div className="flex items-center gap-3">
-          <button disabled={uploading} className={button}>{uploading ? "Reading your resume… (about 30s)" : "Upload"}</button>
+          <button disabled={uploading || fill === "waiting" || fill === "running"} className={button}>{uploading ? "Uploading…" : "Upload"}</button>
           <Status state={uploadState} />
+          <FillStatus fill={fill} />
         </div>
       </form>
 
@@ -88,4 +93,38 @@ export function ProfileForms({ name, email, profile }: Props) {
       </form>
     </div>
   );
+}
+
+type Fill = "waiting" | "running" | { filled: string[] } | "failed" | null;
+
+// After an upload with "Fill in my profile", the worker reads the resume (~30 s). Follow its
+// progress, and re-render when it lands so the form shows the filled-in fields.
+function useProfileFill(queued: boolean, upload: FormState): Fill {
+  const router = useRouter();
+  const [fill, setFill] = useState<{ upload: FormState; value: Fill }>({ upload: null, value: null });
+  useEffect(() => {
+    if (!queued) return;
+    const events = new EventSource("/api/progress");
+    events.onmessage = (e) => {
+      const p: Progress = JSON.parse(e.data);
+      if (p.kind !== "profile") return;
+      setFill({ upload, value: p.state === "running" ? "running" : p.state === "failed" ? "failed" : { filled: p.filled ?? [] } });
+      if (p.state === "finished") router.refresh();
+    };
+    return () => events.close();
+  }, [queued, upload, router]);
+  // A new upload starts over at "waiting" until the worker reports.
+  return queued ? (fill.upload === upload ? fill.value : "waiting") : null;
+}
+
+function FillStatus({ fill }: { fill: Fill }) {
+  const slow = useWorkerHint(fill === "waiting");
+  if (!fill) return null;
+  if (fill === "failed") return <p role="alert" className={errorClass}>Couldn&apos;t fill in your profile: is Ollama running?</p>;
+  const text =
+    fill === "waiting" ? (slow ? WORKER_HINT : "Waiting for the worker…")
+    : fill === "running" ? "Reading your resume with the local model…"
+    : fill.filled.length ? `Filled in ${fill.filled.join(", ")}.`
+    : "Your profile already had everything it found.";
+  return <p role="status" className="text-sm text-muted">{text}</p>;
 }

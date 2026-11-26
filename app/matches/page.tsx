@@ -7,6 +7,8 @@ import { matchesSeen } from "@/db/schema";
 import { trackedJobIds } from "@/lib/applications";
 import { getProfile, topCandidates } from "@/lib/candidates";
 import { ratingsFor } from "@/lib/feedback";
+import { SCORE_QUEUE, type ScoreJob } from "@/lib/queue";
+import { lastRun, timeAgo } from "@/lib/run-status";
 import { DEMO } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
 import { TrackButton } from "../track-button";
@@ -71,6 +73,8 @@ async function Matches() {
     DEMO ? [] : db.select({ at: matchesSeen.seenAt }).from(matchesSeen).where(eq(matchesSeen.userId, user.id)),
     ratingsFor(user.id, jobs.map((j) => j.id)),
   ]);
+  // The last full scoring run (not single jobs scored from their page), which outlives a refresh.
+  const run = await lastRun(SCORE_QUEUE, user.id, (data) => !(data as ScoreJob).jobId).catch(() => null);
   // Scored since the last visit (the daily run, or scoring that finished after the user left).
   // A first visit marks nothing new: every score would be.
   const isNew = (j: { scoredAt: Date | null }) => Boolean(seen && j.scoredAt && j.scoredAt > seen.at);
@@ -83,7 +87,14 @@ async function Matches() {
       <Muted className="mt-6 tabular-nums">
         {jobs.length} jobs{unscored ? `, ${unscored} not scored yet` : ", all scored"}
         {fresh > 0 && <span className="text-accent">{` · ${fresh} new since your last visit`}</span>}
+        {run?.state === "finished" && ` · last scored ${timeAgo(run.at)}`}
+        {(run?.state === "queued" || run?.state === "running") && ` · a scoring run is ${run.state === "queued" ? "waiting for the worker" : "in progress"}`}
       </Muted>
+      {run?.state === "failed" && (
+        <p role="alert" className={`mt-2 ${errorClass}`}>
+          The last scoring run failed {timeAgo(run.at)}{run.error ? `: ${run.error}` : ""}. Check that Ollama is running and both models are pulled.
+        </p>
+      )}
       {!DEMO && <MarkSeen latest={latest} />}
 
       <ul className="mt-2 divide-y divide-border border-y border-border">

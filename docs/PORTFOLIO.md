@@ -19,7 +19,7 @@ Everything needed to put this project on a resume, a portfolio site, LinkedIn or
 | **Live demo** | `<DEMO_URL>` (runs entirely on a PGlite snapshot; no server, model or key needed) |
 | **Role** | Solo: design, backend, frontend, ML evaluation, infra |
 | **When** | November 2026 |
-| **Size** | ~6,000 lines of TypeScript; 20+ commits; 10 database migrations; 126 tests (24 files) |
+| **Size** | ~6,000 lines of TypeScript; 20+ commits; 10 database migrations; 132 tests (26 files) |
 | **Cost to run** | $0: local models (Ollama), Postgres, free Vercel plan for the demo |
 
 **Stack:** TypeScript, Next.js 16 (App Router, Cache Components, server actions), React 19, Tailwind CSS 4, PostgreSQL 16 + pgvector, Drizzle ORM, PGlite (Postgres in WASM), Ollama (`qwen2.5:7b`, `nomic-embed-text`), pg-boss (job queue on Postgres), Playwright, Better Auth, Zod, Model Context Protocol (MCP) SDK, Vitest, Docker Compose, GitHub Actions.
@@ -52,7 +52,7 @@ Pick the version that fits the role. Keep 3–4 bullets.
 - Built a full-stack job search app (search with filters, AI match scores, company research, drag-and-drop application tracker with optimistic updates, auth with sign-up controls, password reset and account deletion) on Next.js 16 server components and server actions.
 - Streamed background-job progress to the browser with Postgres LISTEN/NOTIFY and server-sent events: no polling and no extra message broker.
 - Shipped a zero-cost public demo: the whole app runs on a Postgres-in-WASM (PGlite) snapshot with recorded model output on Vercel's free plan, with per-visitor tracker state kept in a cookie so visitors never see each other's changes.
-- Covered the app with 126 tests, including integration tests against real Postgres + pgvector in-process (no Docker), and a CI smoke test that loads every public page in headless Chromium.
+- Covered the app with 132 tests, including integration tests against real Postgres + pgvector in-process (no Docker), and a CI smoke test that loads every public page in headless Chromium.
 
 ### Backend / infrastructure version
 
@@ -120,11 +120,11 @@ flowchart LR
 
 ### Engineering quality
 
-- **126 tests:** unit tests for pure logic, and integration tests that boot real Postgres + pgvector in-process (PGlite) with every migration applied, then run the real search, ingest, scoring and server actions. No Docker needed to test.
+- **132 tests:** unit tests for pure logic, and integration tests that boot real Postgres + pgvector in-process (PGlite) with every migration applied, then run the real search, ingest, scoring and server actions. No Docker needed to test.
 - **Tests that can fail:** checked by deliberately breaking code (reverting the semantic cutoff or the re-embed rule makes tests fail).
 - **CI on every push:** lint, typecheck, tests, migrations on an empty pgvector Postgres, production build, then a demo build served and smoke-tested in headless Chromium (fails on any console error).
 - **Security:** every server action re-checks the signed-in user and validates input with Zod; one user can never read or change another's data (integration-tested); research only crawls a curated list of sites, never a user-supplied URL; sign-up can be closed or invite-only (enforced in the auth layer, covering OAuth too); password reset doesn't reveal which emails have accounts; account deletion cascades through every table.
-- **Honest failure modes:** search falls back to keyword-only if the model is down and says so; a worker that isn't running is reported after 30 s instead of "Queued…" forever.
+- **Honest failure modes:** search falls back to keyword-only if the model is down and says so; a worker that isn't running is reported after 30 s instead of "Queued…" forever; a failed background run, and its cause, is still shown after a refresh.
 
 ---
 
@@ -136,7 +136,7 @@ flowchart LR
 | Search | Postgres `websearch_to_tsquery` over a GIN index + pgvector cosine distance, merged by reciprocal rank fusion (k = 60); semantic hits kept only under `min(0.40, best + 0.08)` (measured on 18 queries); filters as SQL regex built from the same word lists as tested JS regexes |
 | Fit ranking | Scored ≥ 40 first, then unscored by embedding closeness, then poor scores; joins search results as a third ranked list |
 | Scoring | `qwen2.5:7b` via Ollama structured output: score, role fit, required years, quoted location rule, skills; code computes seniority, verifies the location rule against the posting's own sentences, strips non-skill tags, caps the score |
-| Resume | PDF signature and size checks; only extracted text stored; the model fills empty profile fields and code adds only skills the resume text contains |
+| Resume | PDF signature and size checks; only extracted text stored; on the worker, the model fills empty profile fields and code adds only skills the resume text contains (upload answers in 0.3 s instead of ~30 s) |
 | Research | Playwright reads the home page + up to 3 same-site About/Engineering/Culture pages; brief keeps only names found on the pages; shared by all users, refreshed weekly |
 | Background agent | pg-boss queues (exclusive per user), daily cron with `missed: once`, heartbeats, first run on an empty database, progress over LISTEN/NOTIFY → SSE |
 | Tracker | 5 columns, drag and drop + keyboard menu, `useOptimistic`, undo after remove, notes, applied date (auto-filled), next step, follow-ups with overdue alerts in the viewer's time zone |
@@ -224,7 +224,7 @@ These are the "why did you…" answers.
 | Profile embedding | ~85 ms → ~1–2 ms per page load | measured, review 3.3 |
 | Crash recovery | up to 3 h → ~80 s | measured, review 2.1 |
 | Docker first run | 7,224 jobs (33 companies) ingested + embedded in 8.5 min | measured, review 3.4 |
-| Tests | 126 in 24 files (unit + integration) | `npm test` |
+| Tests | 132 in 26 files (unit + integration) | `npm test` |
 | Code | ~6,000 lines of TypeScript, 20+ commits, 10 migrations | repo |
 | MCP tools | 6 | `scripts/mcp.mts` |
 | Run cost | $0 | local models, Postgres, free Vercel plan |
